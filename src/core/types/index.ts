@@ -1,16 +1,12 @@
-export interface User {
-  id: string
-  name: string
-  email: string
-  avatar?: string
-  role: string
-}
-
-export interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-}
+/**
+ * Tipos de UI (layout, navegación, toasts...) y, marcados como **mocks**, los
+ * que hoy usan los módulos con datos de mentira.
+ *
+ * Los tipos de las respuestas del backend **no** se escriben aquí: salen del
+ * contrato OpenAPI (`src/core/api/types.ts`, ADR-0008). `Order`, `Customer`,
+ * `Agency`, `Payment` y `Permission` siguen siendo los mocks del andamiaje y se
+ * sustituyen por los del contrato al conectar cada módulo (paso 5.6 de la Fase 1).
+ */
 
 export interface ThemeState {
   theme: 'light' | 'dark'

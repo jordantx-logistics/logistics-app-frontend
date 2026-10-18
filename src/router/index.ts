@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth } from '@/core/composables/useAuth'
+
+import { authGuard } from './guard'
 
 // Import all module routes
 import authRoutes from '@/modules/auth/routes'
@@ -13,6 +14,8 @@ import settingsRoutes from '@/modules/settings/routes'
 
 // Aggregate all routes
 const routes = [
+  // `/` no tiene pantalla propia: entra por el dashboard (que exige sesión).
+  { path: '/', redirect: { name: 'dashboard' } },
   ...authRoutes,
   ...dashboardRoutes,
   ...ordersRoutes,
@@ -28,18 +31,7 @@ const router = createRouter({
   routes,
 })
 
-// Navigation guard for authentication
-router.beforeEach((to) => {
-  const { isAuthenticated } = useAuth()
-  const requiresAuth = to.meta?.requiresAuth !== false
-
-  if (requiresAuth && !isAuthenticated) {
-    return { name: 'login' }
-  }
-
-  if (!requiresAuth && isAuthenticated && to.name === 'login') {
-    return { name: 'dashboard' }
-  }
-})
+// Sesión, login y permisos: ver `src/router/guard.ts`.
+router.beforeEach(authGuard)
 
 export default router

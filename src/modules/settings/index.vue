@@ -9,22 +9,16 @@ import Toggle from '@/core/components/Toggle.vue'
 import Textarea from '@/core/components/Textarea.vue'
 import { useAuth } from '@/core/composables/useAuth'
 import { useTheme } from '@/core/composables/useTheme'
-import {
-  Users,
-  Bell,
-  Shield,
-  Palette,
-  Save,
-} from 'lucide-vue-next'
+import { Users, Bell, Shield, Palette, Save } from 'lucide-vue-next'
 
-const { user } = useAuth()
+const { authStore } = useAuth()
 const { themeStore, setTheme } = useTheme()
 
 const activeTab = ref('profile')
 
 const profileForm = ref({
-  name: user?.name || 'John Doe',
-  email: user?.email || 'john@example.com',
+  name: authStore.user?.name || 'John Doe',
+  email: authStore.user?.email || 'john@example.com',
   phone: '+1 234 567 8900',
   bio: 'Logistics manager with 10+ years of experience.',
 })
@@ -55,23 +49,35 @@ const appearanceSettings = ref({
       <div class="settings-layout">
         <aside class="settings-sidebar">
           <nav class="settings-nav">
-            <button class="settings-nav-item" :class="{ active: activeTab === 'profile' }"
-              @click="activeTab = 'profile'">
+            <button
+              class="settings-nav-item"
+              :class="{ active: activeTab === 'profile' }"
+              @click="activeTab = 'profile'"
+            >
               <Users :size="16" stroke-width="2" />
               Profile
             </button>
-            <button class="settings-nav-item" :class="{ active: activeTab === 'notifications' }"
-              @click="activeTab = 'notifications'">
+            <button
+              class="settings-nav-item"
+              :class="{ active: activeTab === 'notifications' }"
+              @click="activeTab = 'notifications'"
+            >
               <Bell :size="16" stroke-width="2" />
               Notifications
             </button>
-            <button class="settings-nav-item" :class="{ active: activeTab === 'appearance' }"
-              @click="activeTab = 'appearance'">
+            <button
+              class="settings-nav-item"
+              :class="{ active: activeTab === 'appearance' }"
+              @click="activeTab = 'appearance'"
+            >
               <Palette :size="16" stroke-width="2" />
               Appearance
             </button>
-            <button class="settings-nav-item" :class="{ active: activeTab === 'security' }"
-              @click="activeTab = 'security'">
+            <button
+              class="settings-nav-item"
+              :class="{ active: activeTab === 'security' }"
+              @click="activeTab = 'security'"
+            >
               <Shield :size="16" stroke-width="2" />
               Security
             </button>
@@ -94,7 +100,11 @@ const appearanceSettings = ref({
                 <Input label="Phone" v-model="profileForm.phone" />
               </div>
               <div class="form-group">
-                <Textarea label="Bio" v-model="profileForm.bio" placeholder="Tell us about yourself..." />
+                <Textarea
+                  label="Bio"
+                  v-model="profileForm.bio"
+                  placeholder="Tell us about yourself..."
+                />
               </div>
               <div class="form-actions">
                 <Button variant="primary">
@@ -113,16 +123,25 @@ const appearanceSettings = ref({
             </template>
             <div class="settings-form">
               <div class="form-group">
-                <Toggle label="Email Notifications" :model-value="notificationSettings.email"
-                  @update:model-value="notificationSettings.email = $event" />
+                <Toggle
+                  label="Email Notifications"
+                  :model-value="notificationSettings.email"
+                  @update:model-value="notificationSettings.email = $event"
+                />
               </div>
               <div class="form-group">
-                <Toggle label="Push Notifications" :model-value="notificationSettings.push"
-                  @update:model-value="notificationSettings.push = $event" />
+                <Toggle
+                  label="Push Notifications"
+                  :model-value="notificationSettings.push"
+                  @update:model-value="notificationSettings.push = $event"
+                />
               </div>
               <div class="form-group">
-                <Toggle label="SMS Notifications" :model-value="notificationSettings.sms"
-                  @update:model-value="notificationSettings.sms = $event" />
+                <Toggle
+                  label="SMS Notifications"
+                  :model-value="notificationSettings.sms"
+                  @update:model-value="notificationSettings.sms = $event"
+                />
               </div>
             </div>
           </Card>
@@ -133,22 +152,33 @@ const appearanceSettings = ref({
             </template>
             <div class="settings-form">
               <div class="form-group">
-                <Toggle label="Dark Mode" :model-value="themeStore.theme === 'dark'"
-                  @update:model-value="setTheme(themeStore.theme === 'dark' ? 'light' : 'dark')" />
+                <Toggle
+                  label="Dark Mode"
+                  :model-value="themeStore.theme === 'dark'"
+                  @update:model-value="setTheme(themeStore.theme === 'dark' ? 'light' : 'dark')"
+                />
               </div>
               <div class="form-group">
-                <Select label="Language" :options="[
-                  { label: 'English', value: 'en' },
-                  { label: 'Spanish', value: 'es' },
-                  { label: 'French', value: 'fr' },
-                ]" v-model="appearanceSettings.language" />
+                <Select
+                  label="Language"
+                  :options="[
+                    { label: 'English', value: 'en' },
+                    { label: 'Spanish', value: 'es' },
+                    { label: 'French', value: 'fr' },
+                  ]"
+                  v-model="appearanceSettings.language"
+                />
               </div>
               <div class="form-group">
-                <Select label="Timezone" :options="[
-                  { label: 'UTC', value: 'UTC' },
-                  { label: 'EST', value: 'EST' },
-                  { label: 'PST', value: 'PST' },
-                ]" v-model="appearanceSettings.timezone" />
+                <Select
+                  label="Timezone"
+                  :options="[
+                    { label: 'UTC', value: 'UTC' },
+                    { label: 'EST', value: 'EST' },
+                    { label: 'PST', value: 'PST' },
+                  ]"
+                  v-model="appearanceSettings.timezone"
+                />
               </div>
             </div>
           </Card>
@@ -168,9 +198,7 @@ const appearanceSettings = ref({
                 <Input label="Confirm New Password" type="password" placeholder="••••••••" />
               </div>
               <div class="form-actions">
-                <Button variant="primary">
-                  Update Password
-                </Button>
+                <Button variant="primary"> Update Password </Button>
               </div>
             </div>
           </Card>

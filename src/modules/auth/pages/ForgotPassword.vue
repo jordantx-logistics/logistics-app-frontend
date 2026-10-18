@@ -4,21 +4,32 @@ import { useRouter } from 'vue-router'
 import AuthLayout from '@/core/components/AuthLayout.vue'
 import Button from '@/core/components/Button.vue'
 import Input from '@/core/components/Input.vue'
+import { forgotPassword } from '@/core/api/auth'
+import { toApiError } from '@/core/api/errors'
 import { useToast } from '@/core/composables/useToast'
 
 const router = useRouter()
-const { success, error } = useToast()
+const { success } = useToast()
 
 const email = ref('')
 const loading = ref(false)
+const formError = ref('')
 
 async function onSubmit() {
   loading.value = true
+  formError.value = ''
+
   try {
-    success('Password reset link sent to your email.')
-    router.push('/auth/login')
-  } catch {
-    error('Failed to send reset link. Please try again.')
+    // El backend responde lo mismo exista o no la cuenta (no filtra correos).
+    const response = await forgotPassword({ email: email.value })
+    success(response.message)
+    await router.push({ name: 'login' })
+  } catch (error) {
+    const apiError = toApiError(error)
+
+    formError.value = apiError.isRateLimited
+      ? 'Demasiados intentos. Espera un minuto y vuelve a probar.'
+      : (apiError.fieldError('email') ?? apiError.message)
   } finally {
     loading.value = false
   }
@@ -35,9 +46,11 @@ async function onSubmit() {
         <Input label="Email" type="email" placeholder="you@example.com" v-model="email" required />
       </div>
 
-      <Button type="submit" variant="primary" :loading="loading" block>
-        Send reset link
-      </Button>
+      <p v-if="formError" class="forgot-error" role="alert">{{ formError }}</p>
+
+      <Button type="submit" variant="primary" :loading="loading" block> Send reset link </Button>
+
+      <RouterLink class="forgot-link" :to="{ name: 'login' }">Back to sign in</RouterLink>
     </form>
   </AuthLayout>
 </template>
@@ -66,5 +79,21 @@ async function onSubmit() {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.forgot-error {
+  font-size: 13px;
+  color: #e04545;
+  text-align: center;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.forgot-link:hover {
+  color: var(--fg);
 }
 </style>

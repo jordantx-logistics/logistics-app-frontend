@@ -6,30 +6,62 @@ import Card from '@/core/components/Card.vue'
 import Button from '@/core/components/Button.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import type { Column } from '@/core/components/types'
-import {
-  ArrowUp,
-  ArrowDown,
-  Users,
-  Package,
-  DollarSign,
-  Truck,
-} from 'lucide-vue-next'
+import { ArrowUp, ArrowDown, Users, Package, DollarSign, Truck } from 'lucide-vue-next'
 
-const { user } = useAuth()
+const { authStore } = useAuth()
 
 const stats = ref([
-  { label: 'Total Orders', value: '1,234', change: '+12.5%', up: true, icon: Package, color: '#6366f1' },
-  { label: 'Revenue', value: '$45,678', change: '+8.2%', up: true, icon: DollarSign, color: '#10b981' },
-  { label: 'Active Drivers', value: '42', change: '-3.1%', up: false, icon: Truck, color: '#f59e0b' },
+  {
+    label: 'Total Orders',
+    value: '1,234',
+    change: '+12.5%',
+    up: true,
+    icon: Package,
+    color: '#6366f1',
+  },
+  {
+    label: 'Revenue',
+    value: '$45,678',
+    change: '+8.2%',
+    up: true,
+    icon: DollarSign,
+    color: '#10b981',
+  },
+  {
+    label: 'Active Drivers',
+    value: '42',
+    change: '-3.1%',
+    up: false,
+    icon: Truck,
+    color: '#f59e0b',
+  },
   { label: 'Customers', value: '892', change: '+15.3%', up: true, icon: Users, color: '#ef4444' },
 ])
 
 const recentOrders = ref([
-  { id: 'ORD-001', customer: 'Acme Corp', status: 'Delivered', amount: '$1,250', date: '2024-01-15' },
-  { id: 'ORD-002', customer: 'Beta Industries', status: 'In Transit', amount: '$890', date: '2024-01-14' },
+  {
+    id: 'ORD-001',
+    customer: 'Acme Corp',
+    status: 'Delivered',
+    amount: '$1,250',
+    date: '2024-01-15',
+  },
+  {
+    id: 'ORD-002',
+    customer: 'Beta Industries',
+    status: 'In Transit',
+    amount: '$890',
+    date: '2024-01-14',
+  },
   { id: 'ORD-003', customer: 'Gamma LLC', status: 'Pending', amount: '$2,100', date: '2024-01-14' },
   { id: 'ORD-004', customer: 'Delta Inc', status: 'Delivered', amount: '$750', date: '2024-01-13' },
-  { id: 'ORD-005', customer: 'Epsilon Co', status: 'In Transit', amount: '$1,800', date: '2024-01-13' },
+  {
+    id: 'ORD-005',
+    customer: 'Epsilon Co',
+    status: 'In Transit',
+    amount: '$1,800',
+    date: '2024-01-13',
+  },
 ])
 
 const columns: Column[] = [
@@ -39,7 +71,6 @@ const columns: Column[] = [
   { key: 'amount', label: 'Amount', sortable: true },
   { key: 'date', label: 'Date', sortable: true },
 ]
-
 </script>
 
 <template>
@@ -47,13 +78,11 @@ const columns: Column[] = [
     <div class="dashboard">
       <div class="dashboard-header">
         <div>
-          <h1 class="dashboard-title">Welcome back, {{ user?.name || 'User' }}!</h1>
+          <h1 class="dashboard-title">Welcome back, {{ authStore.user?.name || 'User' }}!</h1>
           <p class="dashboard-subtitle">Here's what's happening with your logistics</p>
         </div>
         <div class="dashboard-actions">
-          <Button variant="primary">
-            New Order
-          </Button>
+          <Button variant="primary"> New Order </Button>
         </div>
       </div>
 
@@ -81,8 +110,15 @@ const columns: Column[] = [
               <Button variant="ghost">View All</Button>
             </div>
           </template>
-          <DataTable :columns="columns" :data="recentOrders" :pagination="true" :per-page="5" :current-page="1"
-            :searchable="true" class="orders-table" />
+          <DataTable
+            :columns="columns"
+            :data="recentOrders"
+            :pagination="true"
+            :per-page="5"
+            :current-page="1"
+            :searchable="true"
+            class="orders-table"
+          />
         </Card>
 
         <Card class="activity-card">
@@ -91,10 +127,16 @@ const columns: Column[] = [
           </template>
           <div class="activity-list">
             <div v-for="i in 5" :key="i" class="activity-item">
-              <div class="activity-dot"
-                :style="{ background: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i - 1] }" />
+              <div
+                class="activity-dot"
+                :style="{
+                  background: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][i - 1],
+                }"
+              />
               <div class="activity-content">
-                <div class="activity-text">Order #ORD-00{{ i }} {{ i % 2 === 0 ? 'delivered' : 'in transit' }}</div>
+                <div class="activity-text">
+                  Order #ORD-00{{ i }} {{ i % 2 === 0 ? 'delivered' : 'in transit' }}
+                </div>
                 <div class="activity-time">{{ i }},000</div>
               </div>
             </div>
