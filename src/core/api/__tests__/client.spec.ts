@@ -72,7 +72,7 @@ describe('cliente HTTP', () => {
       success: false,
       message: 'The given data was invalid.',
       error_code: 'VALIDATION',
-      errors: { email: ['El campo email es obligatorio.'] },
+      errors: { email: ['The email field is required.'] },
     })
 
     const error = await http.post('/api/v1/auth/login').catch((e: unknown) => e)
@@ -84,7 +84,7 @@ describe('cliente HTTP', () => {
     expect(apiError.message).toBe('The given data was invalid.')
     expect(apiError.errorCode).toBe('VALIDATION')
     expect(apiError.isValidationError).toBe(true)
-    expect(apiError.fieldError('email')).toBe('El campo email es obligatorio.')
+    expect(apiError.fieldError('email')).toBe('The email field is required.')
   })
 
   it('marca los fallos sin respuesta como error de red', async () => {
@@ -97,6 +97,7 @@ describe('cliente HTTP', () => {
     expect(error).toBeInstanceOf(ApiError)
     expect((error as ApiError).status).toBeNull()
     expect((error as ApiError).isNetworkError).toBe(true)
+    expect((error as ApiError).message).toBe('Could not reach the server.')
   })
 
   it('reintenta una vez tras pedir una cookie CSRF nueva cuando llega 419', async () => {

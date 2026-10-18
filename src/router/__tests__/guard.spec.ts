@@ -111,9 +111,7 @@ describe('guard de sesión', () => {
   })
 
   it('no revienta si el backend no responde: manda al login', async () => {
-    vi.mocked(authApi.me).mockRejectedValue(
-      new ApiError('No se pudo contactar con el servidor.', null),
-    )
+    vi.mocked(authApi.me).mockRejectedValue(new ApiError('Could not reach the server.', null))
 
     await expect(
       authGuard(route({ meta: { requiresAuth: true }, fullPath: '/orders' })),

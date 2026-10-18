@@ -28,7 +28,7 @@ async function onSubmit() {
     const apiError = toApiError(error)
 
     formError.value = apiError.isRateLimited
-      ? 'Demasiados intentos. Espera un minuto y vuelve a probar.'
+      ? 'Too many attempts. Wait a minute and try again.'
       : (apiError.fieldError('email') ?? apiError.message)
   } finally {
     loading.value = false

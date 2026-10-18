@@ -77,9 +77,7 @@ describe('store de sesión', () => {
   })
 
   it('propaga los errores que no son de sesión (red, 5xx)', async () => {
-    vi.mocked(authApi.me).mockRejectedValue(
-      new ApiError('No se pudo contactar con el servidor.', null),
-    )
+    vi.mocked(authApi.me).mockRejectedValue(new ApiError('Could not reach the server.', null))
 
     const store = useAuthStore()
 
@@ -101,9 +99,7 @@ describe('store de sesión', () => {
 
   it('limpia la sesión al cerrarla, aunque el backend falle', async () => {
     vi.mocked(authApi.login).mockResolvedValue(session())
-    vi.mocked(authApi.logout).mockRejectedValue(
-      new ApiError('No se pudo contactar con el servidor.', null),
-    )
+    vi.mocked(authApi.logout).mockRejectedValue(new ApiError('Could not reach the server.', null))
 
     const store = useAuthStore()
     await store.login({ email: 'admin@test.com', password: 'secret123' })

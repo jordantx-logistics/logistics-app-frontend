@@ -21,11 +21,11 @@ function messageFor(error: unknown): string {
   const apiError = toApiError(error)
 
   if (apiError.isRateLimited) {
-    return 'Demasiados intentos. Espera un minuto y vuelve a probar.'
+    return 'Too many attempts. Wait a minute and try again.'
   }
 
   if (apiError.isValidationError || apiError.isUnauthenticated) {
-    return 'Credenciales incorrectas.'
+    return 'Invalid credentials.'
   }
 
   return apiError.message
@@ -37,7 +37,7 @@ async function onSubmit() {
 
   try {
     await login({ email: email.value, password: password.value })
-    success('Sesión iniciada.')
+    success('Signed in.')
 
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/dashboard'
     await router.push(redirect)

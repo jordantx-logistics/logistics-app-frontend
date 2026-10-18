@@ -25,7 +25,7 @@ const formError = ref('')
 
 async function onSubmit() {
   if (password.value !== confirmPassword.value) {
-    formError.value = 'Las contraseñas no coinciden.'
+    formError.value = 'Passwords do not match.'
     return
   }
 
@@ -45,7 +45,7 @@ async function onSubmit() {
     const apiError = toApiError(error)
 
     formError.value = apiError.isRateLimited
-      ? 'Demasiados intentos. Espera un minuto y vuelve a probar.'
+      ? 'Too many attempts. Wait a minute and try again.'
       : (apiError.fieldError('password') ?? apiError.fieldError('email') ?? apiError.message)
   } finally {
     loading.value = false

@@ -18,7 +18,6 @@ declare global {
   interface Window {
     __APP_CONFIG__?: {
       apiUrl?: string
-      sentryDsn?: string
     }
   }
 }

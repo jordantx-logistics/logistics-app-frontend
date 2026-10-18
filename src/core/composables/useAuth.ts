@@ -23,7 +23,7 @@ export function useAuth() {
       // La sesión local ya se limpió (el store lo hace en un `finally`); lo que
       // falló es invalidarla en el servidor, así que conviene avisar: si el
       // usuario recarga, la cookie puede devolverle la sesión.
-      warning('No se pudo cerrar la sesión en el servidor.')
+      warning('The session could not be closed on the server.')
     } finally {
       await router.push({ name: 'login' })
     }

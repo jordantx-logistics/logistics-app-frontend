@@ -100,7 +100,7 @@ export function toApiError(error: unknown): ApiError {
     }
 
     return new ApiError(
-      status === null ? 'No se pudo contactar con el servidor.' : error.message,
+      status === null ? 'Could not reach the server.' : error.message,
       status,
       undefined,
       undefined,
@@ -109,7 +109,7 @@ export function toApiError(error: unknown): ApiError {
   }
 
   return new ApiError(
-    error instanceof Error ? error.message : 'Error inesperado.',
+    error instanceof Error ? error.message : 'Unexpected error.',
     null,
     undefined,
     undefined,
