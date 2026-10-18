@@ -1,5 +1,7 @@
 # Logistics App Frontend - Development Guide
 
+> **Aviso (Fase 1):** esto es material del andamiaje y está desactualizado: describe un login por token que ya no existe, la pantalla de registro (retirada) y da por buenos los datos mock de los módulos. Lo vigente es **`AGENTS.md`** (este repo) y el spec privado `logistics-app-spec` (`03-roadmap/fase-01-migracion-mvp.md` §5 y `05-frontend/web-backoffice/`).
+
 ## Project Overview
 
 Vue 3.5+ logistics management dashboard application built with Vite, TypeScript, and Tailwind CSS. The app implements a modular architecture with authentication, theming, and 8 feature modules for complete logistics operations management.

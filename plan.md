@@ -1,5 +1,11 @@
 Plan de implementación para completar proyecto basado en referencia `references\logitrack-dashboard.html`
 
+> **Aviso (Fase 1):** plan del andamiaje, en gran parte ya ejecutado y superado. Los datos
+> mock de los módulos se retiran módulo a módulo contra el API real, y el estado vigente
+> vive en **`AGENTS.md`** (este repo) y en el spec privado `logistics-app-spec`
+> (`03-roadmap/fase-01-migracion-mvp.md` §5 y `05-frontend/web-backoffice/`).
+> `references\logitrack-dashboard.html` sigue valiendo como referencia visual.
+
 ---
 
 ## **PHASE 1: CORRECTION DE ERRORES Y CALIDAD DE CÓDIGO**
