@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   LayoutDashboard,
@@ -11,6 +12,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-vue-next'
+
+import { useAuth } from '@/core/composables/useAuth'
+import type { NavItem } from '@/core/types'
 
 const props = withDefaults(
   defineProps<{
@@ -29,31 +33,45 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const { can } = useAuth()
 
-const navGroups = [
+/**
+ * Navegación escrita a mano, con el permiso que abre cada pantalla: las
+ * entradas que el rol no puede usar no se pintan, para no llevar al usuario a
+ * una pantalla que el backend respondería con 403. Igual que el guard, esto es
+ * **presentación**: la autorización real la hace el backend en cada ruta.
+ */
+const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: 'Main',
     items: [
       { label: 'Dashboard', icon: 'LayoutDashboard', path: '/dashboard' },
-      { label: 'Orders', icon: 'ShoppingCart', path: '/orders', badge: '3' },
+      { label: 'Orders', icon: 'ShoppingCart', path: '/orders', permission: 'orders.view' },
     ],
   },
   {
     label: 'Management',
     items: [
       { label: 'Payments', icon: 'CreditCard', path: '/payments' },
-      { label: 'Customers', icon: 'Users', path: '/customers' },
-      { label: 'Agencies', icon: 'Building2', path: '/agencies' },
+      { label: 'Customers', icon: 'Users', path: '/customers', permission: 'persons.view' },
+      { label: 'Agencies', icon: 'Building2', path: '/agencies', permission: 'agencies.view' },
     ],
   },
   {
     label: 'System',
     items: [
-      { label: 'Permissions', icon: 'ShieldCheck', path: '/permissions' },
+      { label: 'Permissions', icon: 'ShieldCheck', path: '/permissions', permission: 'roles.view' },
       { label: 'Settings', icon: 'Settings', path: '/settings' },
     ],
   },
 ]
+
+const navGroups = computed(() =>
+  NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.permission || can(item.permission)),
+  })).filter((group) => group.items.length > 0),
+)
 
 type Icon =
   | typeof LayoutDashboard

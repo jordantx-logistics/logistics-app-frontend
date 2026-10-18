@@ -18,21 +18,29 @@ type JsonOf<Response> = Response extends { content: { 'application/json': infer 
   ? Body
   : never
 
-/** Respuesta `200` del mapa de respuestas de una operación. */
-type OkOf<Responses> = Responses extends { 200: infer Response } ? Response : never
+/** Respuesta de éxito del mapa: los listados responden `200` y las altas `201`. */
+type OkOf<Responses> = Responses extends { 200: infer Response }
+  ? Response
+  : Responses extends { 201: infer Response }
+    ? Response
+    : never
 
 /** Respuesta completa de un endpoint (sobre incluido). */
-type ResponseOf<Path extends keyof paths, Method extends 'get' | 'post'> = Required<
+type ResponseOf<Path extends keyof paths, Method extends 'get' | 'post' | 'put'> = Required<
   JsonOf<OkOf<NonNullable<paths[Path][Method]>['responses']>>
 >
 
 /** Cuerpo de la petición de un endpoint. */
 export type RequestOf<
   Path extends keyof paths,
-  Method extends 'get' | 'post',
+  Method extends 'get' | 'post' | 'put',
 > = paths[Path][Method] extends { requestBody: { content: { 'application/json': infer Body } } }
   ? Body
   : never
+
+/** Query string de un endpoint (`page`, `per_page`...). */
+type QueryOf<Path extends keyof paths, Method extends 'get'> =
+  NonNullable<paths[Path][Method]> extends { parameters: { query?: infer Query } } ? Query : never
 
 /** Respuesta que solo confirma (`success` + `message`, sin `data`). */
 export type AuthMessage = ResponseOf<'/api/v1/auth/logout', 'post'>
@@ -72,3 +80,99 @@ export type ForgotPasswordPayload = RequestOf<'/api/v1/auth/forgot-password', 'p
 
 /** `POST /api/v1/auth/reset-password`. */
 export type ResetPasswordPayload = RequestOf<'/api/v1/auth/reset-password', 'post'>
+
+// ---------------------------------------------------------------------------
+// Clientes (`src/Customer`): personas y empresas
+// ---------------------------------------------------------------------------
+
+/** `GET /api/v1/customer/persons` — personas registradas. */
+export type ListPersonsResponse = ResponseOf<'/api/v1/customer/persons', 'get'>
+
+/** Fila de persona (el contrato no marca `required`, la capa API sí). */
+export type Person = Required<NonNullable<ListPersonsResponse['data']>[number]>
+
+/** `POST /api/v1/customer/persons`. */
+export type CreatePersonPayload = RequestOf<'/api/v1/customer/persons', 'post'>
+
+/** Respuesta del alta de persona. */
+export type CreatePersonResponse = ResponseOf<'/api/v1/customer/persons', 'post'>
+
+/** `GET /api/v1/customer/companies` — clientes corporativos. */
+export type ListCompaniesResponse = ResponseOf<'/api/v1/customer/companies', 'get'>
+
+/** Fila de empresa. */
+export type Company = Required<NonNullable<ListCompaniesResponse['data']>[number]>
+
+/** `POST /api/v1/customer/companies`. */
+export type CreateCompanyPayload = RequestOf<'/api/v1/customer/companies', 'post'>
+
+/** Respuesta del alta de empresa. */
+export type CreateCompanyResponse = ResponseOf<'/api/v1/customer/companies', 'post'>
+
+// ---------------------------------------------------------------------------
+// Agencias (`src/Organization`)
+// ---------------------------------------------------------------------------
+
+/** `GET /api/v1/organization/agencies` — agencias configuradas. */
+export type ListAgenciesResponse = ResponseOf<'/api/v1/organization/agencies', 'get'>
+
+/** Fila de agencia. */
+export type Agency = Required<NonNullable<ListAgenciesResponse['data']>[number]>
+
+/** `POST /api/v1/organization/agencies`. */
+export type CreateAgencyPayload = RequestOf<'/api/v1/organization/agencies', 'post'>
+
+/** Respuesta del alta de agencia. */
+export type CreateAgencyResponse = ResponseOf<'/api/v1/organization/agencies', 'post'>
+
+// ---------------------------------------------------------------------------
+// Roles y permisos (`src/Permission`)
+// ---------------------------------------------------------------------------
+
+/** `GET /api/v1/permission/roles` — el controlador envuelve la colección. */
+export type ListRolesResponse = ResponseOf<'/api/v1/permission/roles', 'get'>
+
+/** Fila de rol, con los **nombres** de sus permisos. */
+export type Role = Required<NonNullable<ListRolesResponse['data']['roles']>[number]>
+
+/** `POST /api/v1/permission/roles`. */
+export type CreateRolePayload = RequestOf<'/api/v1/permission/roles', 'post'>
+
+/** `GET /api/v1/permission/permissions` — catálogo completo. */
+export type ListPermissionsResponse = ResponseOf<'/api/v1/permission/permissions', 'get'>
+
+/** Fila de permiso (`recurso.accion`). */
+export type Permission = Required<
+  NonNullable<ListPermissionsResponse['data']['permissions']>[number]
+>
+
+/** `POST /api/v1/permission/roles/{id}/permissions` — sustituye los del rol. */
+export type AssignPermissionsPayload = RequestOf<
+  '/api/v1/permission/roles/{id}/permissions',
+  'post'
+>
+
+/** Respuesta de la asignación de permisos a un rol. */
+export type AssignPermissionsResponse = ResponseOf<
+  '/api/v1/permission/roles/{id}/permissions',
+  'post'
+>
+
+// ---------------------------------------------------------------------------
+// Órdenes (`src/Logistics/Order`)
+// ---------------------------------------------------------------------------
+
+/** `GET /api/v1/logistics/orders` — paginado con el sobre estándar. */
+export type ListOrdersResponse = ResponseOf<'/api/v1/logistics/orders', 'get'>
+
+/** Fila de orden. Solo ids: los nombres llegan en la Fase 3. */
+export type Order = Required<NonNullable<ListOrdersResponse['data']>[number]>
+
+/** `meta` del paginador de Laravel. */
+export type OrdersPageMeta = Required<NonNullable<ListOrdersResponse['meta']>>
+
+/** `page` / `per_page` del listado de órdenes. */
+export type OrdersQuery = NonNullable<QueryOf<'/api/v1/logistics/orders', 'get'>>
+
+/** `POST /api/v1/logistics/orders` (lo usará el formulario de órdenes). */
+export type CreateOrderPayload = RequestOf<'/api/v1/logistics/orders', 'post'>

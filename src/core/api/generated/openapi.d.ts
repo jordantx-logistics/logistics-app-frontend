@@ -210,7 +210,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /**
+     * List Logistics Orders
+     * @description Returns the orders visible to the authenticated user, newest first, paginated with `page` and `per_page` (max 100).
+     */
+    get: operations['listLogisticsOrders']
     put?: never
     /**
      * Create Logistics Order
@@ -289,7 +293,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List all permissions */
+    /**
+     * List all permissions
+     * @description El controlador envuelve la colección (`data.permissions`), y eso no se
+     *     puede inferir de un `@apiResource`: la forma se documenta a mano para que
+     *     el contrato no mienta (`spec/08-calidad/02-contrato-openapi-frontend.md`).
+     */
     get: operations['listAllPermissions']
     put?: never
     /** Create a new permission */
@@ -332,7 +341,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** List all roles */
+    /**
+     * List all roles
+     * @description El controlador envuelve la colección (`data.roles`), y eso no se puede
+     *     inferir de un `@apiResource`: la forma se documenta a mano para que el
+     *     contrato no mienta (`spec/08-calidad/02-contrato-openapi-frontend.md`).
+     */
     get: operations['listAllRoles']
     put?: never
     /** Create a new role */
@@ -383,7 +397,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Assign permissions to a role */
+    /**
+     * Assign permissions to a role
+     * @description Sustituye los permisos del rol por los que llegan (`syncPermissions`).
+     */
     post: operations['assignPermissionsToARole']
     delete?: never
     options?: never
@@ -766,44 +783,47 @@ export interface operations {
             /**
              * @example [
              *       {
-             *         "id": null,
-             *         "tax_id": null,
-             *         "business_name": null,
-             *         "trade_name": null,
-             *         "address": null,
-             *         "contact_email": null,
-             *         "contact_phone": null,
-             *         "created_at": null
+             *         "id": 7,
+             *         "tax_id": "20151757680",
+             *         "business_name": "Hirthe Inc S.A.C.",
+             *         "trade_name": "Hauck-Leuschke",
+             *         "address": "544 Aglae Ridge Apt. 067\nLefflerhaven, TX 58408-7043",
+             *         "contact_email": "pauline09@labadie.com",
+             *         "contact_phone": "417-663-0574",
+             *         "created_at": "2026-10-18T21:31:29.000000Z"
              *       },
              *       {
-             *         "id": null,
-             *         "tax_id": null,
-             *         "business_name": null,
-             *         "trade_name": null,
-             *         "address": null,
-             *         "contact_email": null,
-             *         "contact_phone": null,
-             *         "created_at": null
+             *         "id": 8,
+             *         "tax_id": "20445197905",
+             *         "business_name": "King-Fahey S.A.C.",
+             *         "trade_name": "Balistreri, Torp and Doyle",
+             *         "address": "759 Eileen Street Apt. 985\nNorth Jacquesmouth, MI 49722",
+             *         "contact_email": "bcruickshank@kovacek.info",
+             *         "contact_phone": "(469) 693-1854",
+             *         "created_at": "2026-10-18T21:31:29.000000Z"
              *       }
              *     ]
              */
             data?: {
-              /** @example null */
-              id?: string | null
-              /** @example null */
-              tax_id?: string | null
-              /** @example null */
-              business_name?: string | null
-              /** @example null */
-              trade_name?: string | null
-              /** @example null */
-              address?: string | null
-              /** @example null */
-              contact_email?: string | null
-              /** @example null */
-              contact_phone?: string | null
-              /** @example null */
-              created_at?: string | null
+              /** @example 7 */
+              id?: number
+              /** @example 20151757680 */
+              tax_id?: string
+              /** @example Hirthe Inc S.A.C. */
+              business_name?: string
+              /** @example Hauck-Leuschke */
+              trade_name?: string
+              /**
+               * @example 544 Aglae Ridge Apt. 067
+               *     Lefflerhaven, TX 58408-7043
+               */
+              address?: string
+              /** @example pauline09@labadie.com */
+              contact_email?: string
+              /** @example 417-663-0574 */
+              contact_phone?: string
+              /** @example 2026-10-18T21:31:29.000000Z */
+              created_at?: string
             }[]
             /** @example true */
             success?: string
@@ -855,29 +875,32 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': {
             data?: {
-              /** @example null */
-              id?: string | null
-              /** @example null */
-              tax_id?: string | null
-              /** @example null */
-              business_name?: string | null
-              /** @example null */
-              trade_name?: string | null
-              /** @example null */
-              address?: string | null
-              /** @example null */
-              contact_email?: string | null
-              /** @example null */
-              contact_phone?: string | null
-              /** @example null */
-              created_at?: string | null
+              /** @example 9 */
+              id?: number
+              /** @example 20055437432 */
+              tax_id?: string
+              /** @example Price Ltd S.A.C. */
+              business_name?: string
+              /** @example Dare Group */
+              trade_name?: string
+              /**
+               * @example 334 Fritsch Knoll
+               *     Careymouth, IA 64310-6432
+               */
+              address?: string
+              /** @example matilda.feeney@leffler.info */
+              contact_email?: string
+              /** @example 337-329-5127 */
+              contact_phone?: string
+              /** @example 2026-10-18T21:31:29.000000Z */
+              created_at?: string
             }
             /** @example true */
             success?: string
@@ -906,29 +929,29 @@ export interface operations {
             /**
              * @example [
              *       {
-             *         "id": 21,
+             *         "id": 30,
              *         "document_type": "DNI",
              *         "document_number": "51757680",
              *         "first_name": "Noah",
              *         "last_name": "Cronin",
              *         "email": "emelie.baumbach@example.net",
              *         "phone": "203-867-3351",
-             *         "created_at": "2026-10-18T20:18:04.000000Z"
+             *         "created_at": "2026-10-18T21:31:29.000000Z"
              *       },
              *       {
-             *         "id": 22,
+             *         "id": 31,
              *         "document_type": "DNI",
              *         "document_number": "70917515",
              *         "first_name": "Daryl",
              *         "last_name": "VonRueden",
              *         "email": "feeney.demarcus@example.com",
              *         "phone": "559.897.7788",
-             *         "created_at": "2026-10-18T20:18:04.000000Z"
+             *         "created_at": "2026-10-18T21:31:29.000000Z"
              *       }
              *     ]
              */
             data?: {
-              /** @example 21 */
+              /** @example 30 */
               id?: number
               /** @example DNI */
               document_type?: string
@@ -942,7 +965,7 @@ export interface operations {
               email?: string
               /** @example 203-867-3351 */
               phone?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:29.000000Z */
               created_at?: string
             }[]
             /** @example true */
@@ -998,14 +1021,14 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': {
             data?: {
-              /** @example 23 */
+              /** @example 32 */
               id?: number
               /** @example DNI */
               document_type?: string
@@ -1019,12 +1042,159 @@ export interface operations {
               email?: string
               /** @example 646-329-5127 */
               phone?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:29.000000Z */
               created_at?: string
             }
             /** @example true */
             success?: string
             /** @example Person created successfully. */
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listLogisticsOrders: {
+    parameters: {
+      query?: {
+        /**
+         * @description Page to return.
+         * @example 2
+         */
+        page?: number
+        /**
+         * @description Rows per page (1..100, por defecto 15).
+         * @example 15
+         */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            /**
+             * @example [
+             *       {
+             *         "id": 1,
+             *         "ticket_number": "ORD-0000001",
+             *         "ticket_code": "M5FOJEMY",
+             *         "status": "pending",
+             *         "weight_kg": "10.000",
+             *         "total_amount": "30.00",
+             *         "sender_id": 1,
+             *         "receiver_id": 2,
+             *         "origin_agency_id": 1,
+             *         "destination_agency_id": 1,
+             *         "created_at": "2026-10-16T05:13:12.000000Z"
+             *       },
+             *       {
+             *         "id": 1,
+             *         "ticket_number": "ORD-0000001",
+             *         "ticket_code": "M5FOJEMY",
+             *         "status": "pending",
+             *         "weight_kg": "10.000",
+             *         "total_amount": "30.00",
+             *         "sender_id": 1,
+             *         "receiver_id": 2,
+             *         "origin_agency_id": 1,
+             *         "destination_agency_id": 1,
+             *         "created_at": "2026-10-16T05:13:12.000000Z"
+             *       }
+             *     ]
+             */
+            data?: {
+              /** @example 1 */
+              id?: number
+              /** @example ORD-0000001 */
+              ticket_number?: string
+              /** @example M5FOJEMY */
+              ticket_code?: string
+              /** @example pending */
+              status?: string
+              /** @example 10.000 */
+              weight_kg?: string
+              /** @example 30.00 */
+              total_amount?: string
+              /** @example 1 */
+              sender_id?: number
+              /** @example 2 */
+              receiver_id?: number
+              /** @example 1 */
+              origin_agency_id?: number
+              /** @example 1 */
+              destination_agency_id?: number
+              /** @example 2026-10-16T05:13:12.000000Z */
+              created_at?: string
+            }[]
+            links?: {
+              /** @example /?page=1 */
+              first?: string
+              /** @example /?page=1 */
+              last?: string
+              /** @example null */
+              prev?: string | null
+              /** @example null */
+              next?: string | null
+            }
+            meta?: {
+              /** @example 1 */
+              current_page?: number
+              /** @example 1 */
+              from?: number
+              /** @example 1 */
+              last_page?: number
+              /**
+               * @example [
+               *       {
+               *         "url": null,
+               *         "label": "&laquo; Previous",
+               *         "page": null,
+               *         "active": false
+               *       },
+               *       {
+               *         "url": "/?page=1",
+               *         "label": "1",
+               *         "page": 1,
+               *         "active": true
+               *       },
+               *       {
+               *         "url": null,
+               *         "label": "Next &raquo;",
+               *         "page": null,
+               *         "active": false
+               *       }
+               *     ]
+               */
+              links?: {
+                /** @example null */
+                url?: string | null
+                /** @example &laquo; Previous */
+                label?: string
+                /** @example null */
+                page?: string | null
+                /** @example false */
+                active?: boolean
+              }[]
+              /** @example / */
+              path?: string
+              /** @example 15 */
+              per_page?: number
+              /** @example 2 */
+              to?: number
+              /** @example 2 */
+              total?: number
+            }
+            /** @example true */
+            success?: string
+            /** @example Orders retrieved successfully. */
             message?: string
           }
         }
@@ -1075,7 +1245,7 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -1099,9 +1269,9 @@ export interface operations {
               /** @example 2 */
               receiver_id?: number
               /** @example 1 */
-              origin_agency?: number
+              origin_agency_id?: number
               /** @example 1 */
-              destination?: number
+              destination_agency_id?: number
               /** @example 2026-10-16T05:13:12.000000Z */
               created_at?: string
             }
@@ -1132,7 +1302,7 @@ export interface operations {
             /**
              * @example [
              *       {
-             *         "id": 22,
+             *         "id": 37,
              *         "code": "UWP##",
              *         "name": "Dare Group",
              *         "address": "99279 Kenyatta Knoll",
@@ -1141,7 +1311,7 @@ export interface operations {
              *         "is_active": true
              *       },
              *       {
-             *         "id": 23,
+             *         "id": 38,
              *         "code": "WVL##",
              *         "name": "Considine LLC",
              *         "address": "459 Hank Oval Apt. 905",
@@ -1152,7 +1322,7 @@ export interface operations {
              *     ]
              */
             data?: {
-              /** @example 22 */
+              /** @example 37 */
               id?: number
               /** @example UWP## */
               code?: string
@@ -1211,20 +1381,20 @@ export interface operations {
            * @example p
            */
           district?: string | null
-          /** @example true */
+          /** @example false */
           is_active?: boolean
         }
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': {
             data?: {
-              /** @example 24 */
+              /** @example 39 */
               id?: number
               /** @example WLV## */
               code?: string
@@ -1270,7 +1440,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 25 */
+              /** @example 40 */
               id?: number
               /** @example QWR## */
               code?: string
@@ -1335,7 +1505,7 @@ export interface operations {
            * @example p
            */
           district?: string | null
-          /** @example false */
+          /** @example true */
           is_active?: boolean
         }
       }
@@ -1348,7 +1518,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 26 */
+              /** @example 41 */
               id?: number
               /** @example SIT## */
               code?: string
@@ -1417,17 +1587,34 @@ export interface operations {
         }
         content: {
           'application/json': {
+            /** @example true */
+            success?: boolean
+            /** @example Permissions retrieved successfully. */
+            message?: string
             data?: {
-              /** @example 71 */
-              id?: number
-              /** @example Pearl Hauck Sr. */
-              name?: string
-              /** @example api */
-              guard_name?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
-              created_at?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
-              updated_at?: string
+              /**
+               * @example [
+               *       {
+               *         "id": 1,
+               *         "name": "orders.view",
+               *         "guard_name": "web",
+               *         "created_at": "2026-10-18T20:18:04.000000Z",
+               *         "updated_at": "2026-10-18T20:18:04.000000Z"
+               *       }
+               *     ]
+               */
+              permissions?: {
+                /** @example 1 */
+                id?: number
+                /** @example orders.view */
+                name?: string
+                /** @example web */
+                guard_name?: string
+                /** @example 2026-10-18T20:18:04.000000Z */
+                created_at?: string
+                /** @example 2026-10-18T20:18:04.000000Z */
+                updated_at?: string
+              }[]
             }
           }
         }
@@ -1453,22 +1640,22 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': {
             data?: {
-              /** @example 73 */
+              /** @example 83 */
               id?: number
               /** @example Justina Gaylord */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               updated_at?: string
             }
           }
@@ -1498,15 +1685,15 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 72 */
+              /** @example 82 */
               id?: number
-              /** @example Alanis McLaughlin */
+              /** @example Pearl Hauck Sr. */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               updated_at?: string
             }
           }
@@ -1546,15 +1733,15 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 74 */
+              /** @example 84 */
               id?: number
               /** @example Misael Runte */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               updated_at?: string
             }
           }
@@ -1607,19 +1794,45 @@ export interface operations {
         }
         content: {
           'application/json': {
+            /** @example true */
+            success?: boolean
+            /** @example Roles retrieved successfully. */
+            message?: string
             data?: {
-              /** @example 36 */
-              id?: number
-              /** @example Prof. Marshall Langosh */
-              name?: string
-              /** @example api */
-              guard_name?: string
-              /** @example [] */
-              permissions?: unknown[]
-              /** @example 2026-10-18T20:18:04.000000Z */
-              created_at?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
-              updated_at?: string
+              /**
+               * @example [
+               *       {
+               *         "id": 1,
+               *         "name": "admin",
+               *         "guard_name": "web",
+               *         "permissions": [
+               *           "orders.view",
+               *           "orders.create"
+               *         ],
+               *         "created_at": "2026-10-18T20:18:04.000000Z",
+               *         "updated_at": "2026-10-18T20:18:04.000000Z"
+               *       }
+               *     ]
+               */
+              roles?: {
+                /** @example 1 */
+                id?: number
+                /** @example admin */
+                name?: string
+                /** @example web */
+                guard_name?: string
+                /**
+                 * @example [
+                 *       "orders.view",
+                 *       "orders.create"
+                 *     ]
+                 */
+                permissions?: string[]
+                /** @example 2026-10-18T20:18:04.000000Z */
+                created_at?: string
+                /** @example 2026-10-18T20:18:04.000000Z */
+                updated_at?: string
+              }[]
             }
           }
         }
@@ -1645,24 +1858,24 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      201: {
         headers: {
           [name: string]: unknown
         }
         content: {
           'application/json': {
             data?: {
-              /** @example 38 */
+              /** @example 50 */
               id?: number
               /** @example Ms. Elisabeth Okuneva */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
               /** @example [] */
               permissions?: unknown[]
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               updated_at?: string
             }
           }
@@ -1692,17 +1905,17 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 37 */
+              /** @example 49 */
               id?: number
               /** @example Morgan Hirthe */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
               /** @example [] */
               permissions?: unknown[]
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               updated_at?: string
             }
           }
@@ -1742,17 +1955,17 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 39 */
+              /** @example 51 */
               id?: number
               /** @example Aleen O'Kon */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
               /** @example [] */
               permissions?: unknown[]
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:04.000000Z */
+              /** @example 2026-10-18T21:31:30.000000Z */
               updated_at?: string
             }
           }
@@ -1807,10 +2020,14 @@ export interface operations {
       content: {
         'application/json': {
           /**
-           * @description Must have at least 1 items.
-           * @example []
+           * @description Ids de los permisos del catálogo.
+           * @example [
+           *       1,
+           *       2,
+           *       3
+           *     ]
            */
-          permission_ids: Record<string, never>
+          permission_ids: number[]
         }
       }
     }
@@ -1822,17 +2039,17 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              /** @example 40 */
+              /** @example 52 */
               id?: number
               /** @example Ms. Audra Crooks II */
               name?: string
-              /** @example api */
+              /** @example web */
               guard_name?: string
               /** @example [] */
               permissions?: unknown[]
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               created_at?: string
-              /** @example 2026-10-18T20:18:06.000000Z */
+              /** @example 2026-10-18T21:31:31.000000Z */
               updated_at?: string
             }
           }

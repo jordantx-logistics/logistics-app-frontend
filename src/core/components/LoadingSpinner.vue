@@ -22,6 +22,8 @@ export default { name: 'LoadingSpinner' }
 <style scoped>
 .spinner {
   animation: spin 0.6s linear infinite;
-  color: rgba(255, 255, 255, 0.3);
+  /* Hereda el color del contenedor: sirve igual sobre un botón que sobre una
+     tarjeta clara (antes era blanco fijo y desaparecía fuera del botón). */
+  color: currentColor;
 }
 </style>

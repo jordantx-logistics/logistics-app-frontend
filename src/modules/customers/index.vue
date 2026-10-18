@@ -1,136 +1,190 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { Building2, Plus, Search, Users } from 'lucide-vue-next'
+
+import * as customersApi from '@/core/api/customers'
+import { ApiError, toApiError } from '@/core/api/errors'
+import type { CreateCompanyPayload, CreatePersonPayload } from '@/core/api/types'
 import AppShell from '@/core/components/AppShell.vue'
-import Card from '@/core/components/Card.vue'
-import Button from '@/core/components/Button.vue'
-import Badge from '@/core/components/Badge.vue'
-import Input from '@/core/components/Input.vue'
-import Select from '@/core/components/Select.vue'
-import Modal from '@/core/components/Modal.vue'
-import DataTable from '@/core/components/DataTable.vue'
 import Avatar from '@/core/components/Avatar.vue'
+import Button from '@/core/components/Button.vue'
+import Card from '@/core/components/Card.vue'
+import DataTable from '@/core/components/DataTable.vue'
+import Input from '@/core/components/Input.vue'
+import ListState from '@/core/components/ListState.vue'
+import Modal from '@/core/components/Modal.vue'
+import Pagination from '@/core/components/Pagination.vue'
 import type { Column } from '@/core/components/types'
-import { Users, Search, Download, Plus, CheckCircle, TrendingUp } from 'lucide-vue-next'
+import { useAuth } from '@/core/composables/useAuth'
+import { useAsyncData } from '@/core/composables/useAsyncData'
+import { useToast } from '@/core/composables/useToast'
+import { EMPTY_VALUE, formatDate, formatText } from '@/core/utils/format'
+import { matchesQuery, pageCount, slicePage } from '@/core/utils/list'
+import CompanyForm from './components/CompanyForm.vue'
+import PersonForm from './components/PersonForm.vue'
 
-const searchQuery = ref('')
-const regionFilter = ref('all')
-const showNewCustomer = ref(false)
+/**
+ * Clientes: personas (documento) y empresas (RUC), en dos pestañas.
+ *
+ * Cada listado viene del API entero (sin paginar), así que el buscador y la
+ * paginación son locales; al dar de alta se recarga la lista del API en vez de
+ * insertar la fila a mano.
+ */
 
-const regionOptions = [
-  { label: 'All Regions', value: 'all' },
-  { label: 'North America', value: 'na' },
-  { label: 'Europe', value: 'eu' },
-  { label: 'Asia Pacific', value: 'apac' },
-]
+type Tab = 'persons' | 'companies'
 
-const customers = ref([
-  {
-    id: 'CUST-001',
-    name: 'Acme Corporation',
-    email: 'contact@acme.com',
-    region: 'na',
-    orders: 45,
-    revenue: '$125,000',
-    status: 'active',
-  },
-  {
-    id: 'CUST-002',
-    name: 'Beta Industries',
-    email: 'info@beta.com',
-    region: 'eu',
-    orders: 32,
-    revenue: '$89,000',
-    status: 'active',
-  },
-  {
-    id: 'CUST-003',
-    name: 'Gamma LLC',
-    email: 'hello@gamma.com',
-    region: 'apac',
-    orders: 28,
-    revenue: '$67,500',
-    status: 'active',
-  },
-  {
-    id: 'CUST-004',
-    name: 'Delta Inc',
-    email: 'support@delta.com',
-    region: 'na',
-    orders: 15,
-    revenue: '$34,200',
-    status: 'inactive',
-  },
-  {
-    id: 'CUST-005',
-    name: 'Epsilon Co',
-    email: 'contact@epsilon.com',
-    region: 'eu',
-    orders: 52,
-    revenue: '$156,000',
-    status: 'active',
-  },
-])
+const PER_PAGE = 10
 
-const columns: Column[] = [
-  { key: 'name', label: 'Customer', sortable: true },
-  { key: 'email', label: 'Email', sortable: true },
-  { key: 'region', label: 'Region', sortable: true },
-  { key: 'orders', label: 'Orders', sortable: true },
-  { key: 'revenue', label: 'Revenue', sortable: true },
-  { key: 'status', label: 'Status', sortable: true },
-]
+const { can } = useAuth()
+const { success } = useToast()
 
-const statusColors: Record<string, string> = {
-  active: 'oklch(62% 0.18 145)',
-  inactive: 'oklch(60% 0.20 25)',
-}
+const canSeeCompanies = computed(() => can('companies.view'))
+const canCreatePerson = computed(() => can('persons.manage'))
+const canCreateCompany = computed(() => can('companies.manage'))
 
-function getStatusColor(status: string): string {
-  return statusColors[status] || 'oklch(60% 0.20 25)'
-}
+const tab = ref<Tab>('persons')
+const search = ref('')
+const page = ref(1)
 
-function getStatusLabel(status: string): string {
-  return status.charAt(0).toUpperCase() + status.slice(1)
-}
+const persons = useAsyncData(customersApi.listPersons)
+const companies = useAsyncData(customersApi.listCompanies)
 
-const filteredCustomers = computed(() => {
-  return customers.value.filter((customer) => {
-    const matchesSearch =
-      customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesRegion = regionFilter.value === 'all' || customer.region === regionFilter.value
-    return matchesSearch && matchesRegion
-  })
+onMounted(() => {
+  void persons.load()
+
+  if (canSeeCompanies.value) {
+    void companies.load()
+  }
 })
 
-function openNewCustomer() {
-  showNewCustomer.value = true
+// Un cambio de pestaña o de búsqueda vuelve a la primera página.
+watch([tab, search], () => {
+  page.value = 1
+})
+
+const filteredPersons = computed(() => {
+  const rows = persons.data.value ?? []
+
+  return rows.filter((row) =>
+    matchesQuery(
+      [row.first_name, row.last_name, row.document_type, row.document_number, row.email],
+      search.value,
+    ),
+  )
+})
+
+const filteredCompanies = computed(() => {
+  const rows = companies.data.value ?? []
+
+  return rows.filter((row) =>
+    matchesQuery([row.business_name, row.trade_name, row.tax_id, row.contact_email], search.value),
+  )
+})
+
+const visibleRows = computed(() =>
+  tab.value === 'persons'
+    ? slicePage(filteredPersons.value, page.value, PER_PAGE)
+    : slicePage(filteredCompanies.value, page.value, PER_PAGE),
+)
+
+const filteredTotal = computed(() =>
+  tab.value === 'persons' ? filteredPersons.value.length : filteredCompanies.value.length,
+)
+
+const lastPage = computed(() => pageCount(filteredTotal.value, PER_PAGE))
+
+const list = computed(() => (tab.value === 'persons' ? persons : companies))
+
+const emptyText = computed(() => {
+  const subject = tab.value === 'persons' ? 'persons' : 'companies'
+
+  return search.value.trim() === ''
+    ? `No ${subject} registered yet.`
+    : `No ${subject} match the search.`
+})
+
+const personColumns: Column[] = [
+  { key: 'document', label: 'Document' },
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'created_at', label: 'Created' },
+]
+
+const companyColumns: Column[] = [
+  { key: 'tax_id', label: 'Tax ID' },
+  { key: 'business_name', label: 'Business name' },
+  { key: 'trade_name', label: 'Trade name' },
+  { key: 'contact', label: 'Contact' },
+  { key: 'created_at', label: 'Created' },
+]
+
+// --- Alta -------------------------------------------------------------------
+
+const showForm = ref(false)
+const submitting = ref(false)
+const formError = ref<ApiError | null>(null)
+
+const formTitle = computed(() => (tab.value === 'persons' ? 'Add person' : 'Add company'))
+
+function openForm(): void {
+  formError.value = null
+  showForm.value = true
 }
 
-function closeNewCustomer() {
-  showNewCustomer.value = false
+function closeForm(): void {
+  showForm.value = false
+  formError.value = null
+}
+
+async function create(
+  request: () => Promise<unknown>,
+  reload: () => Promise<void>,
+  message: string,
+): Promise<void> {
+  submitting.value = true
+  formError.value = null
+
+  try {
+    await request()
+    await reload()
+    success(message)
+    closeForm()
+  } catch (caught) {
+    // El 422 se queda en el modal: el formulario pinta los mensajes por campo.
+    formError.value = caught instanceof ApiError ? caught : toApiError(caught)
+  } finally {
+    submitting.value = false
+  }
+}
+
+function submitPerson(payload: CreatePersonPayload): void {
+  void create(() => customersApi.createPerson(payload), persons.load, 'Person created.')
+}
+
+function submitCompany(payload: CreateCompanyPayload): void {
+  void create(() => customersApi.createCompany(payload), companies.load, 'Company created.')
 }
 </script>
 
 <template>
   <AppShell>
     <div class="customers">
-      <div class="customers-header">
+      <div class="page-header">
         <div>
-          <h1 class="customers-title">Customers</h1>
-          <p class="customers-subtitle">Manage your customer database</p>
+          <h1 class="page-title">Customers</h1>
+          <p class="page-subtitle">Individual customers and corporate clients</p>
         </div>
-        <div class="customers-actions">
-          <Button variant="ghost" icon>
-            <Download :size="16" stroke-width="2" />
-          </Button>
-          <Button variant="primary" @click="openNewCustomer">
-            <template #leading>
-              <Plus :size="16" stroke-width="2" />
-            </template>
-            Add Customer
-          </Button>
-        </div>
+        <Button
+          v-if="(tab === 'persons' && canCreatePerson) || (tab === 'companies' && canCreateCompany)"
+          variant="primary"
+          @click="openForm"
+        >
+          <template #leading>
+            <Plus :size="16" stroke-width="2" />
+          </template>
+          {{ formTitle }}
+        </Button>
       </div>
 
       <div class="stats-grid">
@@ -138,77 +192,117 @@ function closeNewCustomer() {
           <div class="stat-icon" style="background: oklch(58% 0.18 255)">
             <Users :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{ customers.length }}</div>
-          <div class="stat-label">Total Customers</div>
+          <div class="stat-value">{{ persons.data.value?.length ?? EMPTY_VALUE }}</div>
+          <div class="stat-label">Persons</div>
         </Card>
-        <Card class="stat-card">
+        <Card v-if="canSeeCompanies" class="stat-card">
           <div class="stat-icon" style="background: oklch(62% 0.18 145)">
-            <CheckCircle :size="20" stroke-width="2" />
+            <Building2 :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">
-            {{ String(customers.filter((c) => c.status === 'active').length) }}
-          </div>
-          <div class="stat-label">Active Customers</div>
-        </Card>
-        <Card class="stat-card">
-          <div class="stat-icon" style="background: oklch(72% 0.16 80)">
-            <TrendingUp :size="20" stroke-width="2" />
-          </div>
-          <div class="stat-value">
-            {{ String(customers.reduce((sum, c) => sum + parseInt(String(c.orders)), 0)) }}
-          </div>
-          <div class="stat-label">Total Orders</div>
+          <div class="stat-value">{{ companies.data.value?.length ?? EMPTY_VALUE }}</div>
+          <div class="stat-label">Companies</div>
         </Card>
       </div>
 
-      <Card class="filters-card">
-        <div class="filters">
-          <div class="filter-search">
-            <Search :size="16" stroke-width="2" />
-            <Input placeholder="Search customers..." v-model="searchQuery" clearable />
-          </div>
-          <div class="filter-dropdown">
-            <Select :options="regionOptions" v-model="regionFilter" placeholder="Region" />
-          </div>
+      <div class="customers-toolbar">
+        <div class="tabs">
+          <button class="tab" :class="{ active: tab === 'persons' }" @click="tab = 'persons'">
+            Persons
+          </button>
+          <button
+            v-if="canSeeCompanies"
+            class="tab"
+            :class="{ active: tab === 'companies' }"
+            @click="tab = 'companies'"
+          >
+            Companies
+          </button>
         </div>
-      </Card>
+        <div class="filter-search">
+          <Search :size="16" stroke-width="2" />
+          <Input placeholder="Search customers..." v-model="search" />
+        </div>
+      </div>
 
       <Card class="table-card">
         <template #header>
           <div class="table-header">
-            <h2 class="table-title">All Customers ({{ filteredCustomers.length }})</h2>
+            <h2 class="table-title">
+              {{ tab === 'persons' ? 'Persons' : 'Companies' }} ({{ filteredTotal }})
+            </h2>
           </div>
         </template>
-        <DataTable
-          :columns="columns"
-          :data="filteredCustomers"
-          :pagination="true"
-          :per-page="5"
-          :current-page="1"
-          :searchable="true"
-          class="customers-table"
+
+        <ListState
+          :status="list.status.value"
+          :error="list.error.value"
+          :empty="visibleRows.length === 0"
+          :empty-text="emptyText"
+          @retry="list.load"
         >
-          <template #name="{ row }">
-            <div class="customer-cell">
-              <Avatar :name="String(row.name)" :size="32" />
-              <div class="customer-info">
-                <div class="customer-name">{{ String(row.name) }}</div>
+          <DataTable
+            v-if="tab === 'persons'"
+            :columns="personColumns"
+            :data="visibleRows"
+            class="customers-table"
+          >
+            <template #document="{ row }">
+              <span class="document">
+                <Badge variant="neutral">{{ formatText(row.document_type) }}</Badge>
+                {{ formatText(row.document_number) }}
+              </span>
+            </template>
+            <template #name="{ row }">
+              <div class="customer-cell">
+                <Avatar :name="`${String(row.first_name)} ${String(row.last_name)}`" :size="32" />
+                <div class="customer-name">
+                  {{ formatText(row.first_name) }} {{ formatText(row.last_name) }}
+                </div>
               </div>
-            </div>
-          </template>
-          <template #status="{ row }">
-            <Badge :color="getStatusColor(String(row.status))">
-              {{ getStatusLabel(String(row.status)) }}
-            </Badge>
-          </template>
-        </DataTable>
+            </template>
+            <template #email="{ row }">{{ formatText(row.email) }}</template>
+            <template #phone="{ row }">{{ formatText(row.phone) }}</template>
+            <template #created_at="{ row }">{{ formatDate(String(row.created_at)) }}</template>
+          </DataTable>
+
+          <DataTable v-else :columns="companyColumns" :data="visibleRows" class="customers-table">
+            <template #tax_id="{ row }">{{ formatText(row.tax_id) }}</template>
+            <template #business_name="{ row }">{{ formatText(row.business_name) }}</template>
+            <template #trade_name="{ row }">{{ formatText(row.trade_name) }}</template>
+            <template #contact="{ row }">
+              <div class="contact-cell">
+                <span>{{ formatText(row.contact_email) }}</span>
+                <span class="contact-phone">{{ formatText(row.contact_phone) }}</span>
+              </div>
+            </template>
+            <template #created_at="{ row }">{{ formatDate(String(row.created_at)) }}</template>
+          </DataTable>
+
+          <Pagination
+            :page="page"
+            :last-page="lastPage"
+            :total="filteredTotal"
+            :per-page="PER_PAGE"
+            @update:page="page = $event"
+          />
+        </ListState>
       </Card>
 
-      <Modal :visible="showNewCustomer" title="Add Customer" @close="closeNewCustomer">
-        <template #footer>
-          <Button variant="ghost" @click="closeNewCustomer"> Cancel </Button>
-          <Button variant="primary"> Add Customer </Button>
-        </template>
+      <Modal :visible="showForm" :title="formTitle" @close="closeForm">
+        <PersonForm
+          v-if="tab === 'persons'"
+          :loading="submitting"
+          :error="formError"
+          @submit="submitPerson"
+          @cancel="closeForm"
+        />
+        <CompanyForm
+          v-else
+          :loading="submitting"
+          :error="formError"
+          @submit="submitCompany"
+          @cancel="closeForm"
+        />
       </Modal>
     </div>
   </AppShell>
@@ -221,21 +315,20 @@ function closeNewCustomer() {
   gap: 24px;
 }
 
-.customers-header {
+.page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
 }
 
-.customers-title {
+.page-title {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--fg);
 }
 
-.customers-subtitle {
+.page-subtitle {
   font-size: 13px;
   color: var(--muted);
   margin-top: 2px;
@@ -245,7 +338,6 @@ function closeNewCustomer() {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 .stat-card {
@@ -281,14 +373,36 @@ function closeNewCustomer() {
   color: var(--muted);
 }
 
-.filters-card {
-  padding: 16px;
-}
-
-.filters {
+.customers-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-search {
@@ -296,14 +410,8 @@ function closeNewCustomer() {
   align-items: center;
   gap: 8px;
   flex: 1;
-}
-
-.filter-search input {
-  flex: 1;
-}
-
-.filter-dropdown {
-  min-width: 160px;
+  max-width: 320px;
+  color: var(--muted);
 }
 
 .table-header {
@@ -322,26 +430,33 @@ function closeNewCustomer() {
   overflow-x: auto;
 }
 
+.document {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .customer-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.customer-info {
+.customer-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.contact-cell {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.customer-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--fg);
-}
-
-.CheckCircle,
-.TrendingUp {
-  display: inline-block;
+.contact-phone {
+  font-size: 12px;
+  color: var(--muted);
 }
 </style>
