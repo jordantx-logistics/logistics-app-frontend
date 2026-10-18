@@ -35,8 +35,14 @@ export default { name: 'Input' }
 
 <template>
   <div class="auth-input-wrap" :class="{ error: props.error }">
-    <input class="auth-input" :type="props.type" :value="internalValue" :placeholder="props.placeholder"
-      :disabled="props.disabled" @input="onChange" />
+    <input
+      class="auth-input"
+      :type="props.type"
+      :value="internalValue"
+      :placeholder="props.placeholder"
+      :disabled="props.disabled"
+      @input="onChange"
+    />
   </div>
 </template>
 
@@ -48,7 +54,9 @@ export default { name: 'Input' }
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg);
-  transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .auth-input-wrap:focus-within {

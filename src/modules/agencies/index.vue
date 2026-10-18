@@ -9,14 +9,7 @@ import Select from '@/core/components/Select.vue'
 import Modal from '@/core/components/Modal.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import type { Column } from '@/core/components/types'
-import {
-  Building2,
-  Search,
-  Download,
-  Plus,
-  Users,
-  TrendingUp,
-} from 'lucide-vue-next'
+import { Building2, Search, Download, Plus, Users, TrendingUp } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const statusFilter = ref('all')
@@ -29,11 +22,51 @@ const statusOptions = [
 ]
 
 const agencies = ref([
-  { id: 'AG-001', name: 'LogiTrack East', location: 'New York', agents: 15, status: 'active', revenue: '$250,000', performance: '95%' },
-  { id: 'AG-002', name: 'LogiTrack West', location: 'Los Angeles', agents: 12, status: 'active', revenue: '$180,000', performance: '88%' },
-  { id: 'AG-003', name: 'LogiTrack Central', location: 'Chicago', agents: 8, status: 'active', revenue: '$120,000', performance: '82%' },
-  { id: 'AG-004', name: 'LogiTrack South', location: 'Miami', agents: 6, status: 'inactive', revenue: '$75,000', performance: '70%' },
-  { id: 'AG-005', name: 'LogiTrack North', location: 'Seattle', agents: 10, status: 'active', revenue: '$150,000', performance: '91%' },
+  {
+    id: 'AG-001',
+    name: 'LogiTrack East',
+    location: 'New York',
+    agents: 15,
+    status: 'active',
+    revenue: '$250,000',
+    performance: '95%',
+  },
+  {
+    id: 'AG-002',
+    name: 'LogiTrack West',
+    location: 'Los Angeles',
+    agents: 12,
+    status: 'active',
+    revenue: '$180,000',
+    performance: '88%',
+  },
+  {
+    id: 'AG-003',
+    name: 'LogiTrack Central',
+    location: 'Chicago',
+    agents: 8,
+    status: 'active',
+    revenue: '$120,000',
+    performance: '82%',
+  },
+  {
+    id: 'AG-004',
+    name: 'LogiTrack South',
+    location: 'Miami',
+    agents: 6,
+    status: 'inactive',
+    revenue: '$75,000',
+    performance: '70%',
+  },
+  {
+    id: 'AG-005',
+    name: 'LogiTrack North',
+    location: 'Seattle',
+    agents: 10,
+    status: 'active',
+    revenue: '$150,000',
+    performance: '91%',
+  },
 ])
 
 const columns: Column[] = [
@@ -60,7 +93,8 @@ function getStatusLabel(status: string): string {
 
 const filteredAgencies = computed(() => {
   return agencies.value.filter((agency) => {
-    const matchesSearch = agency.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    const matchesSearch =
+      agency.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       agency.location.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesStatus = statusFilter.value === 'all' || agency.status === statusFilter.value
     return matchesSearch && matchesStatus
@@ -109,14 +143,18 @@ function closeNewAgency() {
           <div class="stat-icon" style="background: oklch(62% 0.18 145)">
             <Users :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{String(agencies.reduce((sum, a) => sum + parseInt(String(a.agents)), 0))}}</div>
+          <div class="stat-value">
+            {{ String(agencies.reduce((sum, a) => sum + parseInt(String(a.agents)), 0)) }}
+          </div>
           <div class="stat-label">Total Agents</div>
         </Card>
         <Card class="stat-card">
           <div class="stat-icon" style="background: oklch(72% 0.16 80)">
             <TrendingUp :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{String(agencies.filter((a) => a.status === 'active').length)}}</div>
+          <div class="stat-value">
+            {{ String(agencies.filter((a) => a.status === 'active').length) }}
+          </div>
           <div class="stat-label">Active Agencies</div>
         </Card>
       </div>
@@ -139,8 +177,15 @@ function closeNewAgency() {
             <h2 class="table-title">All Agencies ({{ filteredAgencies.length }})</h2>
           </div>
         </template>
-        <DataTable :columns="columns" :data="filteredAgencies" :pagination="true" :per-page="5" :current-page="1"
-          :searchable="true" class="agencies-table">
+        <DataTable
+          :columns="columns"
+          :data="filteredAgencies"
+          :pagination="true"
+          :per-page="5"
+          :current-page="1"
+          :searchable="true"
+          class="agencies-table"
+        >
           <template #status="{ row }">
             <Badge :color="getStatusColor(String(row.status))">
               {{ getStatusLabel(String(row.status)) }}
@@ -151,12 +196,8 @@ function closeNewAgency() {
 
       <Modal :visible="showNewAgency" title="Add Agency" @close="closeNewAgency">
         <template #footer>
-          <Button variant="ghost" @click="closeNewAgency">
-            Cancel
-          </Button>
-          <Button variant="primary">
-            Add Agency
-          </Button>
+          <Button variant="ghost" @click="closeNewAgency"> Cancel </Button>
+          <Button variant="primary"> Add Agency </Button>
         </template>
       </Modal>
     </div>

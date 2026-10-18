@@ -46,15 +46,25 @@ function getPageNumbers() {
   <div class="table-container">
     <div class="table-toolbar">
       <div v-if="searchable" class="table-search">
-        <input type="text" placeholder="Search..." :value="searchValue" @update:model-value="onSearchChange" />
+        <input
+          type="text"
+          placeholder="Search..."
+          :value="searchValue"
+          @update:model-value="onSearchChange"
+        />
       </div>
     </div>
 
     <table class="data-table">
       <thead>
         <tr>
-          <th v-for="col in columns" :key="col.key" class="sortable" :class="{ sortable: col.sortable }"
-            @click="col.sortable && emit('update:sort', col.key, 'asc')">
+          <th
+            v-for="col in columns"
+            :key="col.key"
+            class="sortable"
+            :class="{ sortable: col.sortable }"
+            @click="col.sortable && emit('update:sort', col.key, 'asc')"
+          >
             {{ col.label }}
           </th>
         </tr>
@@ -77,7 +87,11 @@ function getPageNumbers() {
           <ChevronLeft :size="14" stroke-width="2" />
         </button>
         <template v-for="page in getPageNumbers()" :key="page">
-          <button class="table-page-btn" :class="{ active: page === currentPage }" @click="$emit('update:page', page)">
+          <button
+            class="table-page-btn"
+            :class="{ active: page === currentPage }"
+            @click="$emit('update:page', page)"
+          >
             {{ page }}
           </button>
         </template>

@@ -14,7 +14,6 @@ const breadcrumbs = computed(() => {
     current: parts.indexOf(p) === parts.length - 1,
   }))
 })
-
 </script>
 
 <!-- eslint-disable-next-line vue/multi-word-component-names -->

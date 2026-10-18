@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* === Design Tokens (CSS Custom Properties) === */
 :root {
@@ -26,8 +26,8 @@
   --success-bg: oklch(62% 0.18 145 / 0.08);
   --warning: oklch(72% 0.16 80);
   --warning-bg: oklch(72% 0.16 80 / 0.08);
-  --danger: oklch(60% 0.20 25);
-  --danger-bg: oklch(60% 0.20 25 / 0.08);
+  --danger: oklch(60% 0.2 25);
+  --danger-bg: oklch(60% 0.2 25 / 0.08);
   --info: oklch(58% 0.18 255);
   --info-bg: oklch(58% 0.18 255 / 0.08);
 
@@ -54,7 +54,7 @@
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --bg: oklch(16% 0.012 250);
   --surface: oklch(20% 0.012 250);
   --surface-raised: oklch(24% 0.012 250);
@@ -69,7 +69,7 @@
   --accent-subtle: oklch(58% 0.18 255 / 0.12);
   --success-bg: oklch(62% 0.18 145 / 0.12);
   --warning-bg: oklch(72% 0.16 80 / 0.12);
-  --danger-bg: oklch(60% 0.20 25 / 0.12);
+  --danger-bg: oklch(60% 0.2 25 / 0.12);
   --info-bg: oklch(58% 0.18 255 / 0.12);
 
   --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2);
@@ -93,7 +93,14 @@ html {
 }
 
 body {
-  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif);
+  font-family: var(
+    --font-body,
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Text',
+    system-ui,
+    sans-serif
+  );
   background: var(--bg);
   color: var(--fg);
   line-height: 1.5;

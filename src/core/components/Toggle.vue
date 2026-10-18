@@ -67,11 +67,11 @@ export default { name: 'Toggle' }
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.toggle input:checked+.toggle-slider {
+.toggle input:checked + .toggle-slider {
   background: #6366f1;
 }
 
-.toggle input:checked+.toggle-slider::after {
+.toggle input:checked + .toggle-slider::after {
   transform: translateX(16px);
 }
 

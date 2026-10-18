@@ -10,14 +10,7 @@ import Modal from '@/core/components/Modal.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import Avatar from '@/core/components/Avatar.vue'
 import type { Column } from '@/core/components/types'
-import {
-  Users,
-  Search,
-  Download,
-  Plus,
-  CheckCircle,
-  TrendingUp,
-} from 'lucide-vue-next'
+import { Users, Search, Download, Plus, CheckCircle, TrendingUp } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const regionFilter = ref('all')
@@ -31,11 +24,51 @@ const regionOptions = [
 ]
 
 const customers = ref([
-  { id: 'CUST-001', name: 'Acme Corporation', email: 'contact@acme.com', region: 'na', orders: 45, revenue: '$125,000', status: 'active' },
-  { id: 'CUST-002', name: 'Beta Industries', email: 'info@beta.com', region: 'eu', orders: 32, revenue: '$89,000', status: 'active' },
-  { id: 'CUST-003', name: 'Gamma LLC', email: 'hello@gamma.com', region: 'apac', orders: 28, revenue: '$67,500', status: 'active' },
-  { id: 'CUST-004', name: 'Delta Inc', email: 'support@delta.com', region: 'na', orders: 15, revenue: '$34,200', status: 'inactive' },
-  { id: 'CUST-005', name: 'Epsilon Co', email: 'contact@epsilon.com', region: 'eu', orders: 52, revenue: '$156,000', status: 'active' },
+  {
+    id: 'CUST-001',
+    name: 'Acme Corporation',
+    email: 'contact@acme.com',
+    region: 'na',
+    orders: 45,
+    revenue: '$125,000',
+    status: 'active',
+  },
+  {
+    id: 'CUST-002',
+    name: 'Beta Industries',
+    email: 'info@beta.com',
+    region: 'eu',
+    orders: 32,
+    revenue: '$89,000',
+    status: 'active',
+  },
+  {
+    id: 'CUST-003',
+    name: 'Gamma LLC',
+    email: 'hello@gamma.com',
+    region: 'apac',
+    orders: 28,
+    revenue: '$67,500',
+    status: 'active',
+  },
+  {
+    id: 'CUST-004',
+    name: 'Delta Inc',
+    email: 'support@delta.com',
+    region: 'na',
+    orders: 15,
+    revenue: '$34,200',
+    status: 'inactive',
+  },
+  {
+    id: 'CUST-005',
+    name: 'Epsilon Co',
+    email: 'contact@epsilon.com',
+    region: 'eu',
+    orders: 52,
+    revenue: '$156,000',
+    status: 'active',
+  },
 ])
 
 const columns: Column[] = [
@@ -62,7 +95,8 @@ function getStatusLabel(status: string): string {
 
 const filteredCustomers = computed(() => {
   return customers.value.filter((customer) => {
-    const matchesSearch = customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    const matchesSearch =
+      customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesRegion = regionFilter.value === 'all' || customer.region === regionFilter.value
     return matchesSearch && matchesRegion
@@ -111,14 +145,18 @@ function closeNewCustomer() {
           <div class="stat-icon" style="background: oklch(62% 0.18 145)">
             <CheckCircle :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{String(customers.filter((c) => c.status === 'active').length)}}</div>
+          <div class="stat-value">
+            {{ String(customers.filter((c) => c.status === 'active').length) }}
+          </div>
           <div class="stat-label">Active Customers</div>
         </Card>
         <Card class="stat-card">
           <div class="stat-icon" style="background: oklch(72% 0.16 80)">
             <TrendingUp :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{String(customers.reduce((sum, c) => sum + parseInt(String(c.orders)), 0))}}</div>
+          <div class="stat-value">
+            {{ String(customers.reduce((sum, c) => sum + parseInt(String(c.orders)), 0)) }}
+          </div>
           <div class="stat-label">Total Orders</div>
         </Card>
       </div>
@@ -141,8 +179,15 @@ function closeNewCustomer() {
             <h2 class="table-title">All Customers ({{ filteredCustomers.length }})</h2>
           </div>
         </template>
-        <DataTable :columns="columns" :data="filteredCustomers" :pagination="true" :per-page="5" :current-page="1"
-          :searchable="true" class="customers-table">
+        <DataTable
+          :columns="columns"
+          :data="filteredCustomers"
+          :pagination="true"
+          :per-page="5"
+          :current-page="1"
+          :searchable="true"
+          class="customers-table"
+        >
           <template #name="{ row }">
             <div class="customer-cell">
               <Avatar :name="String(row.name)" :size="32" />
@@ -161,12 +206,8 @@ function closeNewCustomer() {
 
       <Modal :visible="showNewCustomer" title="Add Customer" @close="closeNewCustomer">
         <template #footer>
-          <Button variant="ghost" @click="closeNewCustomer">
-            Cancel
-          </Button>
-          <Button variant="primary">
-            Add Customer
-          </Button>
+          <Button variant="ghost" @click="closeNewCustomer"> Cancel </Button>
+          <Button variant="primary"> Add Customer </Button>
         </template>
       </Modal>
     </div>

@@ -30,8 +30,13 @@ function onChange(e: Event) {
 export default { name: 'Textarea' }
 
 <template>
-  <textarea class="form-textarea" :value="internalValue" :placeholder="props.placeholder" :rows="props.rows"
-    @input="onChange" />
+  <textarea
+    class="form-textarea"
+    :value="internalValue"
+    :placeholder="props.placeholder"
+    :rows="props.rows"
+    @input="onChange"
+  />
 </template>
 
 <style scoped>
@@ -43,7 +48,9 @@ export default { name: 'Textarea' }
   background: var(--bg);
   color: var(--fg);
   font-size: 13px;
-  transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
   resize: vertical;
   min-height: 80px;
 }

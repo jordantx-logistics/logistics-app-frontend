@@ -7,19 +7,40 @@ import Badge from '@/core/components/Badge.vue'
 import Input from '@/core/components/Input.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import type { Column } from '@/core/components/types'
-import {
-  Shield,
-  Search,
-  Users,
-  Key,
-} from 'lucide-vue-next'
+import { Shield, Search, Users, Key } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 
 const roles = ref([
-  { id: 'role-1', name: 'Administrator', users: 2, permissions: ['dashboard', 'orders', 'payments', 'customers', 'agencies', 'permissions', 'settings'], status: 'active' },
-  { id: 'role-2', name: 'Manager', users: 5, permissions: ['dashboard', 'orders', 'payments', 'customers', 'agencies'], status: 'active' },
-  { id: 'role-3', name: 'Agent', users: 12, permissions: ['dashboard', 'orders', 'customers'], status: 'active' },
+  {
+    id: 'role-1',
+    name: 'Administrator',
+    users: 2,
+    permissions: [
+      'dashboard',
+      'orders',
+      'payments',
+      'customers',
+      'agencies',
+      'permissions',
+      'settings',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'role-2',
+    name: 'Manager',
+    users: 5,
+    permissions: ['dashboard', 'orders', 'payments', 'customers', 'agencies'],
+    status: 'active',
+  },
+  {
+    id: 'role-3',
+    name: 'Agent',
+    users: 12,
+    permissions: ['dashboard', 'orders', 'customers'],
+    status: 'active',
+  },
   { id: 'role-4', name: 'Viewer', users: 8, permissions: ['dashboard'], status: 'inactive' },
 ])
 
@@ -46,9 +67,7 @@ const filteredRoles = computed(() => {
           <p class="permissions-subtitle">Manage roles and access controls</p>
         </div>
         <div class="permissions-actions">
-          <Button variant="primary">
-            Add Role
-          </Button>
+          <Button variant="primary"> Add Role </Button>
         </div>
       </div>
 
@@ -64,7 +83,7 @@ const filteredRoles = computed(() => {
           <div class="stat-icon" style="background: oklch(62% 0.18 145)">
             <Users :size="20" stroke-width="2" />
           </div>
-          <div class="stat-value">{{roles.reduce((sum, r) => sum + r.users, 0)}}</div>
+          <div class="stat-value">{{ roles.reduce((sum, r) => sum + r.users, 0) }}</div>
           <div class="stat-label">Total Users</div>
         </Card>
         <Card class="stat-card">
@@ -91,11 +110,22 @@ const filteredRoles = computed(() => {
             <h2 class="table-title">All Roles ({{ filteredRoles.length }})</h2>
           </div>
         </template>
-        <DataTable :columns="columns" :data="filteredRoles" :pagination="true" :per-page="5" :current-page="1"
-          :searchable="true" class="permissions-table">
+        <DataTable
+          :columns="columns"
+          :data="filteredRoles"
+          :pagination="true"
+          :per-page="5"
+          :current-page="1"
+          :searchable="true"
+          class="permissions-table"
+        >
           <template #permissions="{ row }">
             <div class="permissions-list">
-              <Badge v-for="perm in (row.permissions as string[]).slice(0, 3)" :key="perm" size="sm">
+              <Badge
+                v-for="perm in (row.permissions as string[]).slice(0, 3)"
+                :key="perm"
+                size="sm"
+              >
                 {{ perm }}
               </Badge>
               <span v-if="(row.permissions as string[]).length > 3" class="perm-more">
@@ -104,7 +134,11 @@ const filteredRoles = computed(() => {
             </div>
           </template>
           <template #status="{ row }">
-            <Badge :color="(row.status as string) === 'active' ? 'oklch(62% 0.18 145)' : 'oklch(60% 0.20 25)'">
+            <Badge
+              :color="
+                (row.status as string) === 'active' ? 'oklch(62% 0.18 145)' : 'oklch(60% 0.20 25)'
+              "
+            >
               {{ (row.status as string).charAt(0).toUpperCase() + (row.status as string).slice(1) }}
             </Badge>
           </template>

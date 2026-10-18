@@ -33,7 +33,7 @@ defineExpose({ name: 'ToastContainer' })
   z-index: 200;
   display: flex;
   flex-direction: column;
-  gap: 8px
+  gap: 8px;
 }
 
 .toast {
@@ -47,20 +47,20 @@ defineExpose({ name: 'ToastContainer' })
   box-shadow: var(--shadow-lg);
   font-size: 13px;
   animation: slideIn 200ms ease;
-  min-width: 280px
+  min-width: 280px;
 }
 
 .toast-icon {
   width: 18px;
   height: 18px;
-  flex-shrink: 0
+  flex-shrink: 0;
 }
 
 .toast-success .toast-icon {
-  color: var(--success)
+  color: var(--success);
 }
 
 .toast-error .toast-icon {
-  color: var(--danger)
+  color: var(--danger);
 }
 </style>

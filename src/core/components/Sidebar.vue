@@ -12,13 +12,16 @@ import {
   ChevronRight,
 } from 'lucide-vue-next'
 
-const props = withDefaults(defineProps<{
-  collapsed?: boolean
-  mobileOpen?: boolean
-}>(), {
-  collapsed: false,
-  mobileOpen: false,
-})
+const props = withDefaults(
+  defineProps<{
+    collapsed?: boolean
+    mobileOpen?: boolean
+  }>(),
+  {
+    collapsed: false,
+    mobileOpen: false,
+  },
+)
 
 const emit = defineEmits<{
   toggle: []
@@ -52,7 +55,14 @@ const navGroups = [
   },
 ]
 
-type Icon = typeof LayoutDashboard | typeof ShoppingCart | typeof CreditCard | typeof Users | typeof Building2 | typeof ShieldCheck | typeof Settings
+type Icon =
+  | typeof LayoutDashboard
+  | typeof ShoppingCart
+  | typeof CreditCard
+  | typeof Users
+  | typeof Building2
+  | typeof ShieldCheck
+  | typeof Settings
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -67,7 +77,6 @@ const iconMap: Record<string, Icon> = {
 function handleToggle() {
   emit('toggle')
 }
-
 </script>
 
 <!-- eslint-disable-next-line vue/multi-word-component-names -->
@@ -84,9 +93,18 @@ export default { name: 'Sidebar' }
       <template v-for="group in navGroups" :key="group.label">
         <div v-if="!props.collapsed" class="sidebar-section-label">{{ group.label }}</div>
         <template v-for="item in group.items" :key="item.path">
-          <router-link :to="item.path" class="nav-item" :class="{ active: route.path === item.path }" data-route="true">
-            <component :is="iconMap[item.icon]" class="nav-icon" :size="props.collapsed ? 18 : 18"
-              :stroke-width="props.collapsed ? 2 : 1.5" />
+          <router-link
+            :to="item.path"
+            class="nav-item"
+            :class="{ active: route.path === item.path }"
+            data-route="true"
+          >
+            <component
+              :is="iconMap[item.icon]"
+              class="nav-icon"
+              :size="props.collapsed ? 18 : 18"
+              :stroke-width="props.collapsed ? 2 : 1.5"
+            />
             <span v-if="!props.collapsed" class="nav-item-text">{{ item.label }}</span>
             <span v-if="!props.collapsed && item.badge" class="nav-badge">{{ item.badge }}</span>
             <span v-if="props.collapsed" class="nav-badge" />

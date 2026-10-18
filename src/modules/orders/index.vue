@@ -8,11 +8,7 @@ import Select from '@/core/components/Select.vue'
 import Modal from '@/core/components/Modal.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import type { Column } from '@/core/components/types'
-import {
-  Plus,
-  Search,
-  Download,
-} from 'lucide-vue-next'
+import { Plus, Search, Download } from 'lucide-vue-next'
 
 const searchQuery = ref('')
 const statusFilter = ref('all')
@@ -27,12 +23,60 @@ const statusOptions = [
 ]
 
 const orders = ref([
-  { id: 'ORD-001', customer: 'Acme Corp', origin: 'New York', destination: 'Boston', status: 'delivered', weight: '150kg', date: '2024-01-15' },
-  { id: 'ORD-002', customer: 'Beta Industries', origin: 'Chicago', destination: 'Detroit', status: 'in-transit', weight: '85kg', date: '2024-01-14' },
-  { id: 'ORD-003', customer: 'Gamma LLC', origin: 'Miami', destination: 'Orlando', status: 'pending', weight: '45kg', date: '2024-01-14' },
-  { id: 'ORD-004', customer: 'Delta Inc', origin: 'Seattle', destination: 'Portland', status: 'delivered', weight: '120kg', date: '2024-01-13' },
-  { id: 'ORD-005', customer: 'Epsilon Co', origin: 'Denver', destination: 'Denver', status: 'failed', weight: '60kg', date: '2024-01-13' },
-  { id: 'ORD-006', customer: 'Zeta Corp', origin: 'Houston', destination: 'Dallas', status: 'in-transit', weight: '95kg', date: '2024-01-12' },
+  {
+    id: 'ORD-001',
+    customer: 'Acme Corp',
+    origin: 'New York',
+    destination: 'Boston',
+    status: 'delivered',
+    weight: '150kg',
+    date: '2024-01-15',
+  },
+  {
+    id: 'ORD-002',
+    customer: 'Beta Industries',
+    origin: 'Chicago',
+    destination: 'Detroit',
+    status: 'in-transit',
+    weight: '85kg',
+    date: '2024-01-14',
+  },
+  {
+    id: 'ORD-003',
+    customer: 'Gamma LLC',
+    origin: 'Miami',
+    destination: 'Orlando',
+    status: 'pending',
+    weight: '45kg',
+    date: '2024-01-14',
+  },
+  {
+    id: 'ORD-004',
+    customer: 'Delta Inc',
+    origin: 'Seattle',
+    destination: 'Portland',
+    status: 'delivered',
+    weight: '120kg',
+    date: '2024-01-13',
+  },
+  {
+    id: 'ORD-005',
+    customer: 'Epsilon Co',
+    origin: 'Denver',
+    destination: 'Denver',
+    status: 'failed',
+    weight: '60kg',
+    date: '2024-01-13',
+  },
+  {
+    id: 'ORD-006',
+    customer: 'Zeta Corp',
+    origin: 'Houston',
+    destination: 'Dallas',
+    status: 'in-transit',
+    weight: '95kg',
+    date: '2024-01-12',
+  },
 ])
 
 const columns: Column[] = [
@@ -47,7 +91,8 @@ const columns: Column[] = [
 
 const filteredOrders = computed(() => {
   return orders.value.filter((order) => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    const matchesSearch =
+      order.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       order.customer.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesStatus = statusFilter.value === 'all' || order.status === statusFilter.value
     return matchesSearch && matchesStatus
@@ -102,18 +147,21 @@ function closeNewOrder() {
             <h2 class="table-title">All Orders ({{ filteredOrders.length }})</h2>
           </div>
         </template>
-        <DataTable :columns="columns" :data="filteredOrders" :pagination="true" :per-page="5" :current-page="1"
-          :searchable="true" class="orders-table" />
+        <DataTable
+          :columns="columns"
+          :data="filteredOrders"
+          :pagination="true"
+          :per-page="5"
+          :current-page="1"
+          :searchable="true"
+          class="orders-table"
+        />
       </Card>
 
       <Modal :visible="showNewOrder" title="New Order" @close="closeNewOrder">
         <template #footer>
-          <Button variant="ghost" @click="closeNewOrder">
-            Cancel
-          </Button>
-          <Button variant="primary">
-            Create Order
-          </Button>
+          <Button variant="ghost" @click="closeNewOrder"> Cancel </Button>
+          <Button variant="primary"> Create Order </Button>
         </template>
       </Modal>
     </div>
