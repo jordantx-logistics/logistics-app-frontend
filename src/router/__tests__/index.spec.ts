@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import router from '@/router'
 
-// El mismo glob que usa el router (paso 5.8 de la Fase 1): cada módulo con
-// `src/modules/*/routes.ts`. Si alguien reintroduce el agregado a mano o se
-// rompe la convención, este test lo señala módulo y ruta concretos.
-const routeModules = import.meta.glob<{ default: { path: string }[] }>('@/modules/*/routes.ts', {
-  eager: true,
-})
+// El mismo glob que usa el router: cada módulo con
+// `src/modules/*/router/index.ts`. Si alguien reintroduce el agregado a mano o
+// se rompe la convención, este test lo señala módulo y ruta concretos.
+const routeModules = import.meta.glob<{ default: { path: string }[] }>(
+  '@/modules/*/router/index.ts',
+  {
+    eager: true,
+  },
+)
 
 describe('registro automático de rutas de módulos', () => {
   it('hay módulos que declarar rutas', () => {

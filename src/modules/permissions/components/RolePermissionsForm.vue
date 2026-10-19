@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 
 import type { ApiError } from '@/core/api/errors'
-import type { AssignPermissionsPayload, Permission, Role } from '@/core/api/types'
+import type { AssignPermissionsPayload, Permission, Role } from '../types/permissions.types'
 import Button from '@/core/components/Button.vue'
 import Toggle from '@/core/components/Toggle.vue'
 
@@ -79,7 +79,7 @@ function onSubmit(): void {
 <template>
   <form class="form" @submit.prevent="onSubmit">
     <p class="form-hint">
-      Permissions for <strong>{{ props.role?.name ?? '—' }}</strong
+      Permissions for <strong>{{ props.role?.name ?? '' }}</strong
       >. Saving replaces the role list.
     </p>
 

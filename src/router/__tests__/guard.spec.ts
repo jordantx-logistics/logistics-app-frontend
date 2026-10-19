@@ -9,12 +9,9 @@ import type { MeResponse } from '@/core/api/types'
 
 vi.mock('@/core/api/auth', () => ({
   login: vi.fn<typeof import('@/core/api/auth').login>(),
-  issueToken: vi.fn<typeof import('@/core/api/auth').issueToken>(),
   me: vi.fn<typeof import('@/core/api/auth').me>(),
   logout: vi.fn<typeof import('@/core/api/auth').logout>(),
   logoutAll: vi.fn<typeof import('@/core/api/auth').logoutAll>(),
-  forgotPassword: vi.fn<typeof import('@/core/api/auth').forgotPassword>(),
-  resetPassword: vi.fn<typeof import('@/core/api/auth').resetPassword>(),
 }))
 
 const SESSION: MeResponse = {

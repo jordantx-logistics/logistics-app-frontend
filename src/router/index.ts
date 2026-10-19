@@ -2,14 +2,18 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import { authGuard } from './guard'
 
-// Rutas de cada módulo por convención (paso 5.8 de la Fase 1): un módulo nuevo
-// con `src/modules/<nombre>/routes.ts` queda registrado sin tocar este archivo.
-// `eager: true` trae las rutas de forma sincrónica (el router las necesita
-// en el arranque); el code-splitting lo dan las pantallas, que los `routes.ts`
-// importan de forma diferida.
-const moduleRoutes = import.meta.glob<{ default: RouteRecordRaw[] }>('@/modules/*/routes.ts', {
-  eager: true,
-})
+// Rutas de cada módulo por convención: un módulo nuevo con
+// `src/modules/<nombre>/router/index.ts` queda registrado sin tocar este
+// archivo (el scaffolding lo crea con `pnpm gen:module`). `eager: true` trae
+// las rutas de forma sincrónica (el router las necesita en el arranque); el
+// code-splitting lo dan las pantallas, que el `router/index.ts` de cada módulo
+// importa de forma diferida.
+const moduleRoutes = import.meta.glob<{ default: RouteRecordRaw[] }>(
+  '@/modules/*/router/index.ts',
+  {
+    eager: true,
+  },
+)
 
 const routes = [
   // `/` no tiene pantalla propia: entra por el dashboard (que exige sesión).

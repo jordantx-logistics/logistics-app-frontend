@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 import type { ApiError } from '@/core/api/errors'
-import type { CreateAgencyPayload } from '@/core/api/types'
+import type { CreateAgencyPayload } from '../types/agencies.types'
 import Button from '@/core/components/Button.vue'
 import FormField from '@/core/components/FormField.vue'
 import Input from '@/core/components/Input.vue'

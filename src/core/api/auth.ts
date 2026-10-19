@@ -1,24 +1,15 @@
 import { http } from './client'
 import { API_BASE_PATH } from './config'
-import type {
-  AuthMessage,
-  ForgotPasswordPayload,
-  ForgotPasswordResponse,
-  LoginCredentials,
-  LoginResponse,
-  MeResponse,
-  ResetPasswordPayload,
-  ResetPasswordResponse,
-  TokenCredentials,
-  TokenResponse,
-} from './types'
+import type { AuthMessage, LoginCredentials, LoginResponse, MeResponse } from './types'
 
 /**
- * Endpoints de autenticación (`src/Auth/routes.php` del backend).
+ * Endpoints de **sesión** (`src/Auth/routes.php` del backend), transversales:
+ * los consume `core/stores/auth` (login, me, logout) y con ellos viven el guard
+ * del router y el interceptor de `401`.
  *
- * La SPA usa la **cookie de sesión** (`login`, `me`, `logout`): no hay token en
- * el navegador. `issueToken` es para apps y PDA, donde sí se guarda el token
- * opaco en el almacén seguro del dispositivo.
+ * La SPA usa la **cookie de sesión**: no hay token en el navegador. Lo demás
+ * del dominio auth (recuperación de contraseña, token para apps y PDA) vive en
+ * su módulo: `src/modules/auth/api/auth.api.ts`.
  */
 
 const AUTH_PATH = `${API_BASE_PATH}/auth`
@@ -26,13 +17,6 @@ const AUTH_PATH = `${API_BASE_PATH}/auth`
 /** Inicia sesión y deja la cookie `HttpOnly` puesta. Requiere la cookie CSRF. */
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   const { data } = await http.post<LoginResponse>(`${AUTH_PATH}/login`, credentials)
-
-  return data
-}
-
-/** Emite un token opaco (apps y PDA). El valor solo se muestra una vez. */
-export async function issueToken(credentials: TokenCredentials): Promise<TokenResponse> {
-  const { data } = await http.post<TokenResponse>(`${AUTH_PATH}/token`, credentials)
 
   return data
 }
@@ -54,22 +38,6 @@ export async function logout(): Promise<AuthMessage> {
 /** Cierra **todas** las sesiones del usuario. */
 export async function logoutAll(): Promise<AuthMessage> {
   const { data } = await http.post<AuthMessage>(`${AUTH_PATH}/logout-all`)
-
-  return data
-}
-
-/** Pide el enlace de recuperación. Responde igual exista o no la cuenta. */
-export async function forgotPassword(
-  payload: ForgotPasswordPayload,
-): Promise<ForgotPasswordResponse> {
-  const { data } = await http.post<ForgotPasswordResponse>(`${AUTH_PATH}/forgot-password`, payload)
-
-  return data
-}
-
-/** Cambia la contraseña con el token del enlace de recuperación. */
-export async function resetPassword(payload: ResetPasswordPayload): Promise<ResetPasswordResponse> {
-  const { data } = await http.post<ResetPasswordResponse>(`${AUTH_PATH}/reset-password`, payload)
 
   return data
 }
