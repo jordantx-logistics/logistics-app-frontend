@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { Building2, Plus, Search, Users } from 'lucide-vue-next'
 
 import AppShell from '@/core/components/AppShell.vue'
@@ -54,6 +55,16 @@ const {
   submitPerson,
   submitCompany,
 } = useCustomersTable()
+
+onMounted(() => {
+  void persons.load()
+
+  // La pestaña de empresas solo existe con `companies.view`; sin permiso la
+  // petición daría 403, así que solo se carga cuando se puede ver.
+  if (canSeeCompanies.value) {
+    void companies.load()
+  }
+})
 </script>
 
 <template>
