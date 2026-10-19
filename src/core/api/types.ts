@@ -32,14 +32,15 @@ export type OkOf<Responses> = Responses extends { 200: infer Response }
     : never
 
 /** Respuesta completa de un endpoint (sobre incluido). */
-export type ResponseOf<Path extends keyof paths, Method extends 'get' | 'post' | 'put'> = Required<
-  JsonOf<OkOf<NonNullable<paths[Path][Method]>['responses']>>
->
+export type ResponseOf<
+  Path extends keyof paths,
+  Method extends 'get' | 'post' | 'put' | 'patch' | 'delete',
+> = Required<JsonOf<OkOf<NonNullable<paths[Path][Method]>['responses']>>>
 
 /** Cuerpo de la petición de un endpoint. */
 export type RequestOf<
   Path extends keyof paths,
-  Method extends 'get' | 'post' | 'put',
+  Method extends 'get' | 'post' | 'put' | 'patch' | 'delete',
 > = paths[Path][Method] extends { requestBody: { content: { 'application/json': infer Body } } }
   ? Body
   : never

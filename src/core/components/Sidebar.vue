@@ -11,6 +11,10 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  UserCog,
+  UserRound,
+  Clock,
+  Smartphone,
 } from 'lucide-vue-next'
 
 import { useAuth } from '@/core/composables/useAuth'
@@ -58,8 +62,27 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
+    label: 'Human resources',
+    items: [
+      {
+        label: 'Employees',
+        icon: 'UserRound',
+        path: '/employees',
+        permission: 'employees.manage',
+      },
+      {
+        label: 'Attendance',
+        icon: 'Clock',
+        path: '/attendance',
+        permission: 'attendance.view',
+      },
+    ],
+  },
+  {
     label: 'System',
     items: [
+      { label: 'Users', icon: 'UserCog', path: '/users', permission: 'users.manage' },
+      { label: 'Devices', icon: 'Smartphone', path: '/devices', permission: 'devices.manage' },
       { label: 'Permissions', icon: 'ShieldCheck', path: '/permissions', permission: 'roles.view' },
       { label: 'Settings', icon: 'Settings', path: '/settings' },
     ],
@@ -81,6 +104,10 @@ type Icon =
   | typeof Building2
   | typeof ShieldCheck
   | typeof Settings
+  | typeof UserCog
+  | typeof UserRound
+  | typeof Clock
+  | typeof Smartphone
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -90,6 +117,10 @@ const iconMap: Record<string, Icon> = {
   Building2,
   ShieldCheck,
   Settings,
+  UserCog,
+  UserRound,
+  Clock,
+  Smartphone,
 }
 
 function handleToggle() {
