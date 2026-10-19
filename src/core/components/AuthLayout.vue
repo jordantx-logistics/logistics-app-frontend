@@ -27,7 +27,7 @@ defineExpose({ name: 'AuthLayout' })
   justify-content: center;
   min-height: 100vh;
   background: var(--bg);
-  padding: 24px
+  padding: 24px;
 }
 
 .auth-card {
@@ -37,14 +37,14 @@ defineExpose({ name: 'AuthLayout' })
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 40px 32px;
-  box-shadow: var(--shadow-lg)
+  box-shadow: var(--shadow-lg);
 }
 
 .auth-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 32px
+  margin-bottom: 32px;
 }
 
 .auth-logo-icon {
@@ -57,26 +57,26 @@ defineExpose({ name: 'AuthLayout' })
   justify-content: center;
   color: #fff;
   font-weight: 700;
-  font-size: 16px
+  font-size: 16px;
 }
 
 .auth-logo-text {
   font-size: 20px;
   font-weight: 700;
   color: var(--fg);
-  letter-spacing: -.02em
+  letter-spacing: -0.02em;
 }
 
 .auth-title {
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 4px;
-  letter-spacing: -.02em
+  letter-spacing: -0.02em;
 }
 
 .auth-subtitle {
   color: var(--muted);
   font-size: 14px;
-  margin-bottom: 28px
+  margin-bottom: 28px;
 }
 </style>

@@ -1,0 +1,83 @@
+name: CI
+
+# Regla de ramas (ADR-0010): nada llega a `develop` (staging) ni a `main`
+# (producción) sin pasar por aquí.
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Calidad
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Preparar pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+
+      - name: Preparar Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # `--frozen-lockfile`: el CI no actualiza dependencias, solo comprueba que
+      # el `pnpm-lock.yaml` versionado instala tal cual.
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # Los mismos pasos que `pnpm check` en local, en ese orden: primero el
+      # formato y el estilo (que fallan rápido), luego los tipos, los tests y el
+      # build.
+      - name: Formato (oxfmt)
+        run: pnpm format:check
+
+      - name: Estilo (oxlint + eslint)
+        run: pnpm check:lint
+
+      - name: Tipos (vue-tsc)
+        run: pnpm type-check
+
+      - name: Tests (Vitest)
+        run: pnpm test:unit
+
+      # El contrato OpenAPI va versionado en el repo del backend (criterio 10
+      # de la Fase 1): un checkout adicional trae esa copia (`develop`, el ref
+      # que alimenta staging) y `pnpm gen:api` deriva de ella. Si el resultado
+      # difiere de lo commiteado en `src/core/api/generated/`, el build falla —
+      # o el contrato cambió sin regenerar tipos, o la derivación se tocó a mano.
+      - name: Checkout del backend (contrato versionado)
+        uses: actions/checkout@v7
+        with:
+          repository: jordantx-logistics/logistics-app-backend
+          ref: develop
+          path: logistics-app-backend
+
+      - name: Contrato sin deriva (gen:api + diff)
+        env:
+          CONTRACT_PATH: logistics-app-backend/openapi/openapi.yaml
+        run: |
+          pnpm gen:api
+          git diff --exit-code -- src/core/api/generated || {
+            echo "::error::Deriva del contrato: regenera los tipos con 'pnpm gen:api' (no edites 'src/core/api/generated/' a mano) y commitea el resultado."
+            exit 1
+          }
+
+      - name: Build (Vite)
+        run: pnpm build-only

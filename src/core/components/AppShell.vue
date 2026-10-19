@@ -23,8 +23,12 @@ defineExpose({ name: 'AppShell' })
 
 <template>
   <div class="app-shell">
-    <Sidebar :collapsed="sidebarCollapsed" :mobile-open="mobileSidebarOpen" @toggle="toggleSidebar"
-      @close-mobile="closeMobileSidebar" />
+    <Sidebar
+      :collapsed="sidebarCollapsed"
+      :mobile-open="mobileSidebarOpen"
+      @toggle="toggleSidebar"
+      @close-mobile="closeMobileSidebar"
+    />
     <div class="main-area">
       <Header :collapsed="sidebarCollapsed" @toggle="toggleSidebar" />
       <main class="content">

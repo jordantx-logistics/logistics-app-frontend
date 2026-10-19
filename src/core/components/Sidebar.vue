@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   LayoutDashboard,
@@ -10,15 +11,25 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  UserCog,
+  UserRound,
+  Clock,
+  Smartphone,
 } from 'lucide-vue-next'
 
-const props = withDefaults(defineProps<{
-  collapsed?: boolean
-  mobileOpen?: boolean
-}>(), {
-  collapsed: false,
-  mobileOpen: false,
-})
+import { useAuth } from '@/core/composables/useAuth'
+import type { NavItem } from '@/core/types'
+
+const props = withDefaults(
+  defineProps<{
+    collapsed?: boolean
+    mobileOpen?: boolean
+  }>(),
+  {
+    collapsed: false,
+    mobileOpen: false,
+  },
+)
 
 const emit = defineEmits<{
   toggle: []
@@ -26,33 +37,77 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
+const { can } = useAuth()
 
-const navGroups = [
+/**
+ * Navegación escrita a mano, con el permiso que abre cada pantalla: las
+ * entradas que el rol no puede usar no se pintan, para no llevar al usuario a
+ * una pantalla que el backend respondería con 403. Igual que el guard, esto es
+ * **presentación**: la autorización real la hace el backend en cada ruta.
+ */
+const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: 'Main',
     items: [
       { label: 'Dashboard', icon: 'LayoutDashboard', path: '/dashboard' },
-      { label: 'Orders', icon: 'ShoppingCart', path: '/orders', badge: '3' },
+      { label: 'Orders', icon: 'ShoppingCart', path: '/orders', permission: 'orders.view' },
     ],
   },
   {
     label: 'Management',
     items: [
       { label: 'Payments', icon: 'CreditCard', path: '/payments' },
-      { label: 'Customers', icon: 'Users', path: '/customers' },
-      { label: 'Agencies', icon: 'Building2', path: '/agencies' },
+      { label: 'Customers', icon: 'Users', path: '/customers', permission: 'persons.view' },
+      { label: 'Agencies', icon: 'Building2', path: '/agencies', permission: 'agencies.view' },
+    ],
+  },
+  {
+    label: 'Human resources',
+    items: [
+      {
+        label: 'Employees',
+        icon: 'UserRound',
+        path: '/employees',
+        permission: 'employees.manage',
+      },
+      {
+        label: 'Attendance',
+        icon: 'Clock',
+        path: '/attendance',
+        permission: 'attendance.view',
+      },
     ],
   },
   {
     label: 'System',
     items: [
-      { label: 'Permissions', icon: 'ShieldCheck', path: '/permissions' },
+      { label: 'Users', icon: 'UserCog', path: '/users', permission: 'users.manage' },
+      { label: 'Devices', icon: 'Smartphone', path: '/devices', permission: 'devices.manage' },
+      { label: 'Permissions', icon: 'ShieldCheck', path: '/permissions', permission: 'roles.view' },
       { label: 'Settings', icon: 'Settings', path: '/settings' },
     ],
   },
 ]
 
-type Icon = typeof LayoutDashboard | typeof ShoppingCart | typeof CreditCard | typeof Users | typeof Building2 | typeof ShieldCheck | typeof Settings
+const navGroups = computed(() =>
+  NAV_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.permission || can(item.permission)),
+  })).filter((group) => group.items.length > 0),
+)
+
+type Icon =
+  | typeof LayoutDashboard
+  | typeof ShoppingCart
+  | typeof CreditCard
+  | typeof Users
+  | typeof Building2
+  | typeof ShieldCheck
+  | typeof Settings
+  | typeof UserCog
+  | typeof UserRound
+  | typeof Clock
+  | typeof Smartphone
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -62,12 +117,15 @@ const iconMap: Record<string, Icon> = {
   Building2,
   ShieldCheck,
   Settings,
+  UserCog,
+  UserRound,
+  Clock,
+  Smartphone,
 }
 
 function handleToggle() {
   emit('toggle')
 }
-
 </script>
 
 <!-- eslint-disable-next-line vue/multi-word-component-names -->
@@ -84,9 +142,18 @@ export default { name: 'Sidebar' }
       <template v-for="group in navGroups" :key="group.label">
         <div v-if="!props.collapsed" class="sidebar-section-label">{{ group.label }}</div>
         <template v-for="item in group.items" :key="item.path">
-          <router-link :to="item.path" class="nav-item" :class="{ active: route.path === item.path }" data-route="true">
-            <component :is="iconMap[item.icon]" class="nav-icon" :size="props.collapsed ? 18 : 18"
-              :stroke-width="props.collapsed ? 2 : 1.5" />
+          <router-link
+            :to="item.path"
+            class="nav-item"
+            :class="{ active: route.path === item.path }"
+            data-route="true"
+          >
+            <component
+              :is="iconMap[item.icon]"
+              class="nav-icon"
+              :size="props.collapsed ? 18 : 18"
+              :stroke-width="props.collapsed ? 2 : 1.5"
+            />
             <span v-if="!props.collapsed" class="nav-item-text">{{ item.label }}</span>
             <span v-if="!props.collapsed && item.badge" class="nav-badge">{{ item.badge }}</span>
             <span v-if="props.collapsed" class="nav-badge" />

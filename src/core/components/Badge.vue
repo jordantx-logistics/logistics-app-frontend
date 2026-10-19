@@ -33,7 +33,7 @@ export default { name: 'Badge' }
 :root {
   --oklch-success: oklch(62% 0.18 145);
   --oklch-warning: oklch(72% 0.16 80);
-  --oklch-danger: oklch(60% 0.20 25);
+  --oklch-danger: oklch(60% 0.2 25);
   --oklch-info: oklch(58% 0.18 255);
 }
 
@@ -48,8 +48,8 @@ export default { name: 'Badge' }
 }
 
 .badge-danger {
-  background: rgba(oklch(60% 0.20 25), 0.08);
-  color: oklch(60% 0.20 25);
+  background: rgba(oklch(60% 0.2 25), 0.08);
+  color: oklch(60% 0.2 25);
 }
 
 .badge-info {
@@ -78,7 +78,7 @@ export default { name: 'Badge' }
 }
 
 .badge-dot-danger {
-  background: oklch(60% 0.20 25);
+  background: oklch(60% 0.2 25);
 }
 
 .badge-dot-info {

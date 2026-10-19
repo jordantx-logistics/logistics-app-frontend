@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  Menu,
-  Search,
-  Bell,
-  Moon,
-  Sun,
-  LogOut,
-  ChevronDown,
-  CircleHelp,
-} from 'lucide-vue-next'
+import { Menu, Search, Bell, Moon, Sun, LogOut, ChevronDown, CircleHelp } from 'lucide-vue-next'
 import { useAuth } from '@/core/composables/useAuth'
 import { useTheme } from '@/core/composables/useTheme'
 
@@ -19,7 +10,7 @@ const emit = defineEmits<{
   toggle: []
 }>()
 
-const { logout } = useAuth()
+const { logout, authStore } = useAuth()
 const { themeStore } = useTheme()
 
 const breadcrumbs = computed(() => {
@@ -27,6 +18,19 @@ const breadcrumbs = computed(() => {
   const parts = path.split('/').filter(Boolean)
   return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1))
 })
+
+const userName = computed(() => authStore.user?.name ?? '')
+
+const userInitials = computed(() =>
+  userName.value
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join(''),
+)
+
+const userRole = computed(() => authStore.roles[0] ?? '')
 
 const showUserMenu = ref(false)
 
@@ -43,10 +47,10 @@ function handleLogout() {
   logout()
 }
 
-const currentTheme = computed(() => themeStore.theme === 'dark' ? Moon : Sun)
+const currentTheme = computed(() => (themeStore.theme === 'dark' ? Moon : Sun))
 
 function handleThemeToggle() {
-  (window as unknown as { $toggleTheme?: () => void }).$toggleTheme?.()
+  ;(window as unknown as { $toggleTheme?: () => void }).$toggleTheme?.()
   themeStore.toggle()
 }
 
@@ -92,21 +96,24 @@ onUnmounted(() => {
         <Bell :size="18" stroke-width="1.5" />
         <span class="dot" />
       </button>
-      <button class="header-btn" :title="themeStore.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-        @click="handleThemeToggle">
+      <button
+        class="header-btn"
+        :title="themeStore.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        @click="handleThemeToggle"
+      >
         <component :is="currentTheme" :size="18" stroke-width="1.5" />
       </button>
       <div class="user-menu-wrapper">
         <button class="user-menu-trigger" @click="toggleUserMenu">
-          <div class="header-avatar">JD</div>
+          <div class="header-avatar">{{ userInitials }}</div>
           <ChevronDown :size="14" stroke-width="2" />
         </button>
         <div v-if="showUserMenu" class="user-menu">
           <div class="user-menu-header">
-            <div class="user-menu-avatar">JD</div>
+            <div class="user-menu-avatar">{{ userInitials }}</div>
             <div>
-              <div class="user-menu-name">John Doe</div>
-              <div class="user-menu-role">Administrator</div>
+              <div class="user-menu-name">{{ userName }}</div>
+              <div class="user-menu-role">{{ userRole }}</div>
             </div>
           </div>
           <div class="user-menu-divider" />
@@ -138,7 +145,7 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
-  z-index: 30
+  z-index: 30;
 }
 
 .header-toggle {
@@ -149,12 +156,12 @@ onUnmounted(() => {
   justify-content: center;
   border-radius: var(--radius-md);
   color: var(--muted);
-  transition: all var(--transition-fast)
+  transition: all var(--transition-fast);
 }
 
 .header-toggle:hover {
   background: var(--bg);
-  color: var(--fg)
+  color: var(--fg);
 }
 
 .header-breadcrumb {
@@ -164,12 +171,12 @@ onUnmounted(() => {
   font-size: 13px;
   color: var(--muted);
   flex: 1;
-  min-width: 0
+  min-width: 0;
 }
 
 .header-breadcrumb span {
   color: var(--fg);
-  font-weight: 500
+  font-weight: 500;
 }
 
 .header-search {
@@ -184,13 +191,13 @@ onUnmounted(() => {
   font-size: 13px;
   width: 220px;
   transition: all var(--transition-fast);
-  cursor: text
+  cursor: text;
 }
 
 .header-search:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-subtle);
-  color: var(--fg)
+  color: var(--fg);
 }
 
 .header-search input {
@@ -199,7 +206,7 @@ onUnmounted(() => {
   outline: none;
   color: inherit;
   width: 100%;
-  font-size: 13px
+  font-size: 13px;
 }
 
 .header-search kbd {
@@ -210,14 +217,14 @@ onUnmounted(() => {
   border-radius: 3px;
   background: var(--surface);
   color: var(--muted);
-  flex-shrink: 0
+  flex-shrink: 0;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto
+  margin-left: auto;
 }
 
 .header-btn {
@@ -229,12 +236,12 @@ onUnmounted(() => {
   border-radius: var(--radius-md);
   color: var(--muted);
   transition: all var(--transition-fast);
-  position: relative
+  position: relative;
 }
 
 .header-btn:hover {
   background: var(--bg);
-  color: var(--fg)
+  color: var(--fg);
 }
 
 .header-btn .dot {
@@ -245,7 +252,7 @@ onUnmounted(() => {
   height: 7px;
   background: var(--danger);
   border-radius: 50%;
-  border: 1.5px solid var(--surface)
+  border: 1.5px solid var(--surface);
 }
 
 .header-avatar {
@@ -260,7 +267,7 @@ onUnmounted(() => {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  margin-left: 4px
+  margin-left: 4px;
 }
 
 /* User Menu Dropdown */
@@ -294,7 +301,9 @@ onUnmounted(() => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.06);
   z-index: 100;
   padding: 8px 0;
   animation: slideDown 0.15s ease-out;

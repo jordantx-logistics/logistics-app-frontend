@@ -1,0 +1,362 @@
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { Building2, Plus, Search, Users } from 'lucide-vue-next'
+
+import AppShell from '@/core/components/AppShell.vue'
+import Avatar from '@/core/components/Avatar.vue'
+import Badge from '@/core/components/Badge.vue'
+import Button from '@/core/components/Button.vue'
+import Card from '@/core/components/Card.vue'
+import DataTable from '@/core/components/DataTable.vue'
+import Input from '@/core/components/Input.vue'
+import ListState from '@/core/components/ListState.vue'
+import Modal from '@/core/components/Modal.vue'
+import Pagination from '@/core/components/Pagination.vue'
+import { EMPTY_VALUE, formatDate, formatText } from '@/core/utils/format'
+
+import { useCustomersTable } from '../composables/useCustomersTable'
+import CompanyForm from '../components/CompanyForm.vue'
+import PersonForm from '../components/PersonForm.vue'
+
+/**
+ * Clientes: personas (documento) y empresas (RUC), en dos pestañas.
+ *
+ * Cada listado viene del API entero (sin paginar), así que el buscador y la
+ * paginación son locales; al dar de alta se recarga la lista del API en vez de
+ * insertar la fila a mano.
+ *
+ * La lógica vive en `composables/useCustomersTable.ts`, el estado de datos en
+ * `stores/useCustomersStore.ts` y las llamadas HTTP en `api/customers.api.ts`.
+ */
+
+const {
+  PER_PAGE,
+  persons,
+  companies,
+  canCreatePerson,
+  canCreateCompany,
+  canSeeCompanies,
+  tab,
+  search,
+  page,
+  visibleRows,
+  filteredTotal,
+  lastPage,
+  list,
+  emptyText,
+  personColumns,
+  companyColumns,
+  showForm,
+  submitting,
+  formError,
+  formTitle,
+  openForm,
+  closeForm,
+  submitPerson,
+  submitCompany,
+} = useCustomersTable()
+
+onMounted(() => {
+  void persons.load()
+
+  // La pestaña de empresas solo existe con `companies.view`; sin permiso la
+  // petición daría 403, así que solo se carga cuando se puede ver.
+  if (canSeeCompanies.value) {
+    void companies.load()
+  }
+})
+</script>
+
+<template>
+  <AppShell>
+    <div class="customers">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Customers</h1>
+          <p class="page-subtitle">Individual customers and corporate clients</p>
+        </div>
+        <Button
+          v-if="(tab === 'persons' && canCreatePerson) || (tab === 'companies' && canCreateCompany)"
+          variant="primary"
+          @click="openForm"
+        >
+          <template #leading>
+            <Plus :size="16" stroke-width="2" />
+          </template>
+          {{ formTitle }}
+        </Button>
+      </div>
+
+      <div class="stats-grid">
+        <Card class="stat-card">
+          <div class="stat-icon" style="background: oklch(58% 0.18 255)">
+            <Users :size="20" stroke-width="2" />
+          </div>
+          <div class="stat-value">{{ persons.data?.length ?? EMPTY_VALUE }}</div>
+          <div class="stat-label">Persons</div>
+        </Card>
+        <Card v-if="canSeeCompanies" class="stat-card">
+          <div class="stat-icon" style="background: oklch(62% 0.18 145)">
+            <Building2 :size="20" stroke-width="2" />
+          </div>
+          <div class="stat-value">{{ companies.data?.length ?? EMPTY_VALUE }}</div>
+          <div class="stat-label">Companies</div>
+        </Card>
+      </div>
+
+      <div class="customers-toolbar">
+        <div class="tabs">
+          <button class="tab" :class="{ active: tab === 'persons' }" @click="tab = 'persons'">
+            Persons
+          </button>
+          <button
+            v-if="canSeeCompanies"
+            class="tab"
+            :class="{ active: tab === 'companies' }"
+            @click="tab = 'companies'"
+          >
+            Companies
+          </button>
+        </div>
+        <div class="filter-search">
+          <Search :size="16" stroke-width="2" />
+          <Input placeholder="Search customers..." v-model="search" />
+        </div>
+      </div>
+
+      <Card class="table-card">
+        <template #header>
+          <div class="table-header">
+            <h2 class="table-title">
+              {{ tab === 'persons' ? 'Persons' : 'Companies' }} ({{ filteredTotal }})
+            </h2>
+          </div>
+        </template>
+
+        <ListState
+          :status="list.status"
+          :error="list.error"
+          :empty="visibleRows.length === 0"
+          :empty-text="emptyText"
+          @retry="list.load"
+        >
+          <DataTable
+            v-if="tab === 'persons'"
+            :columns="personColumns"
+            :data="visibleRows"
+            class="customers-table"
+          >
+            <template #document="{ row }">
+              <span class="document">
+                <Badge variant="neutral">{{ formatText(row.document_type) }}</Badge>
+                {{ formatText(row.document_number) }}
+              </span>
+            </template>
+            <template #name="{ row }">
+              <div class="customer-cell">
+                <Avatar :name="`${String(row.first_name)} ${String(row.last_name)}`" :size="32" />
+                <div class="customer-name">
+                  {{ formatText(row.first_name) }} {{ formatText(row.last_name) }}
+                </div>
+              </div>
+            </template>
+            <template #email="{ row }">{{ formatText(row.email) }}</template>
+            <template #phone="{ row }">{{ formatText(row.phone) }}</template>
+            <template #created_at="{ row }">{{ formatDate(String(row.created_at)) }}</template>
+          </DataTable>
+
+          <DataTable v-else :columns="companyColumns" :data="visibleRows" class="customers-table">
+            <template #tax_id="{ row }">{{ formatText(row.tax_id) }}</template>
+            <template #business_name="{ row }">{{ formatText(row.business_name) }}</template>
+            <template #trade_name="{ row }">{{ formatText(row.trade_name) }}</template>
+            <template #contact="{ row }">
+              <div class="contact-cell">
+                <span>{{ formatText(row.contact_email) }}</span>
+                <span class="contact-phone">{{ formatText(row.contact_phone) }}</span>
+              </div>
+            </template>
+            <template #created_at="{ row }">{{ formatDate(String(row.created_at)) }}</template>
+          </DataTable>
+
+          <Pagination
+            :page="page"
+            :last-page="lastPage"
+            :total="filteredTotal"
+            :per-page="PER_PAGE"
+            @update:page="page = $event"
+          />
+        </ListState>
+      </Card>
+
+      <Modal :visible="showForm" :title="formTitle" @close="closeForm">
+        <PersonForm
+          v-if="tab === 'persons'"
+          :loading="submitting"
+          :error="formError"
+          @submit="submitPerson"
+          @cancel="closeForm"
+        />
+        <CompanyForm
+          v-else
+          :loading="submitting"
+          :error="formError"
+          @submit="submitCompany"
+          @cancel="closeForm"
+        />
+      </Modal>
+    </div>
+  </AppShell>
+</template>
+
+<style scoped>
+.customers {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.customers-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 320px;
+  color: var(--muted);
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.customers-table {
+  overflow-x: auto;
+}
+
+.document {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.customer-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-phone {
+  font-size: 12px;
+  color: var(--muted);
+}
+</style>

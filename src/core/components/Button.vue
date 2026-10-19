@@ -19,11 +19,16 @@ defineEmits<{
 export default { name: 'Button' }
 
 <template>
-  <button class="btn" :class="[
-    `btn-${variant || 'primary'}`,
-    `btn-${size || 'md'}`,
-    { loading: loading, block: block },
-  ]" :disabled="disabled || loading" @click="$emit('click')">
+  <button
+    class="btn"
+    :class="[
+      `btn-${variant || 'primary'}`,
+      `btn-${size || 'md'}`,
+      { loading: loading, block: block },
+    ]"
+    :disabled="disabled || loading"
+    @click="$emit('click')"
+  >
     <slot name="leading" />
     <Loader2 v-if="loading" :size="16" class="spinner" stroke-width="2" />
     <slot />
