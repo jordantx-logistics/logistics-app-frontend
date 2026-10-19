@@ -206,6 +206,286 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/identity/attendance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Attendance
+     * @description Lista las marcaciones visibles para el usuario, filtrables por empleado, agencia, estado y rango de fechas.
+     */
+    get: operations['listAttendance']
+    put?: never
+    /**
+     * Register Attendance
+     * @description Registra una marcación de entrada/salida de un empleado. Es idempotente por `idempotency_key`, por lo que los reintentos offline no duplican registros.
+     */
+    post: operations['registerAttendance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/attendance/summary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Attendance Summary
+     * @description Consolidado diario por empleado (`attendance_days`), filtrable por empleado y rango de fechas.
+     */
+    get: operations['attendanceSummary']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/attendance/{attendance_id}/void': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the attendance. */
+        attendance_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Void Attendance
+     * @description Anula una marcación (RRHH). El consolidado del día se recalcula sin ella.
+     */
+    post: operations['voidAttendance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/devices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Devices
+     * @description Lista los dispositivos del usuario (o los de otro usuario con `user_id` si se tiene `devices.manage`).
+     */
+    get: operations['listDevices']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/devices/{device_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the device. */
+        device_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Revoke Device
+     * @description Revoca el dispositivo y sus tokens: la siguiente petición con ese token responde `401`.
+     */
+    delete: operations['revokeDevice']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/employees': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Employees
+     * @description Lista los empleados visibles para el usuario, filtrables por estado, agencia y texto.
+     */
+    get: operations['listEmployees']
+    put?: never
+    /**
+     * Create Employee
+     * @description Da de alta un empleado de RRHH (UC-08).
+     */
+    post: operations['createEmployee']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/employees/{employee_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the employee. */
+        employee_id: number
+      }
+      cookie?: never
+    }
+    /** Request Employee Details */
+    get: operations['requestEmployeeDetails']
+    /** Modify Employee */
+    put: operations['modifyEmployee']
+    post?: never
+    /**
+     * Deactivate Employee
+     * @description Da de baja al empleado (UC-09): `status = terminated` y desactiva su usuario si lo tuviera.
+     */
+    delete: operations['deactivateEmployee']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/users': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Users
+     * @description Lista los usuarios, filtrables por estado, texto (nombre/email) y agencia.
+     */
+    get: operations['listUsers']
+    put?: never
+    /**
+     * Create User
+     * @description Da de alta un usuario (UC-01). Sin roles, se asigna `employee`.
+     */
+    post: operations['createUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/users/{user_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    /** Request User Details */
+    get: operations['requestUserDetails']
+    /**
+     * Modify User
+     * @description Actualiza nombre, email o el vínculo con RRHH del usuario.
+     */
+    put: operations['modifyUser']
+    post?: never
+    /**
+     * Suspend User
+     * @description Atajo de UC-06: suspende al usuario sin pasar por el cambio de estado genérico.
+     */
+    delete: operations['suspendUser']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/users/{user_id}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Change User Status
+     * @description Suspende, reactiva o da de baja al usuario (UC-06). Al desactivarlo se revocan sus tokens.
+     */
+    patch: operations['changeUserStatus']
+    trace?: never
+  }
+  '/api/v1/identity/users/{user_id}/unlock': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Unlock User
+     * @description Limpia el bloqueo por intentos fallidos (UC-07).
+     */
+    post: operations['unlockUser']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/users/{user_id}/agency-scope': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Assign Agency Scope
+     * @description Sincroniza el ámbito de agencia del usuario y su agencia principal (UC-16).
+     */
+    put: operations['assignAgencyScope']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/logistics/orders': {
     parameters: {
       query?: never
@@ -507,8 +787,12 @@ export interface operations {
           password: string
           /** @description Must not be greater than 100 characters. */
           device_name: string
-          /** @description Must not be greater than 50 characters. */
+          /** @description This field is required when <code>device_uuid</code> is present. Must not be greater than 50 characters. */
           platform?: string | null
+          /** @description Must not be greater than 100 characters. */
+          device_uuid?: string | null
+          /** @description Must not be greater than 30 characters. */
+          app_version?: string | null
         }
       }
     }
@@ -823,6 +1107,917 @@ export interface operations {
               last_name?: string
               email?: string
               phone?: string
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listAttendance: {
+    parameters: {
+      query?: {
+        /** @description Filtra por empleado. */
+        employee_id?: number
+        /** @description Filtra por agencia. */
+        agency_id?: number
+        /** @description valid,late,duplicate,voided. */
+        status?: string
+        /** @description Fecha ISO-8601 inferior (inclusive). */
+        from?: string
+        /** @description Fecha ISO-8601 superior (inclusive). */
+        to?: string
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              employee_id?: number
+              agency_id?: number
+              type?: string
+              marked_at?: string
+              source?: string
+              device_id?: string | null
+              latitude?: string | null
+              longitude?: string | null
+              ip_address?: string
+              status?: string
+              idempotency_key?: string
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAttendance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          employee_id: number
+          /** @description Must be at least 1. */
+          agency_id: number
+          /** @enum {string} */
+          type: 'in' | 'out' | 'break-start' | 'break-end'
+          /** @description Must be a valid date. */
+          marked_at?: string | null
+          /** @enum {string|null} */
+          source?: 'web' | 'app' | 'pda' | 'biometric' | null
+          /** @description The <code>id</code> of an existing record in the devices table. */
+          device_id?: number | null
+          /** @description Must be between -90 and 90. */
+          latitude?: number | null
+          /** @description Must be between -180 and 180. */
+          longitude?: number | null
+          /** @description Must not be greater than 64 characters. */
+          idempotency_key: string
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              employee_id?: number
+              agency_id?: number
+              type?: string
+              marked_at?: string
+              source?: string
+              device_id?: string | null
+              latitude?: string | null
+              longitude?: string | null
+              ip_address?: string
+              status?: string
+              idempotency_key?: string
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  attendanceSummary: {
+    parameters: {
+      query?: {
+        /** @description Filtra por empleado. */
+        employee_id?: number
+        /** @description Fecha inferior (inclusive). */
+        from?: string
+        /** @description Fecha superior (inclusive). */
+        to?: string
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              employee_id?: number
+              work_date?: string
+              first_in_at?: string
+              last_out_at?: string
+              worked_minutes?: number
+              late_minutes?: number
+              status?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  voidAttendance: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the attendance. */
+        attendance_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listDevices: {
+    parameters: {
+      query?: {
+        /** @description Dispositivos de otro usuario (requiere `devices.manage`). */
+        user_id?: number
+        /** @description active,revoked. */
+        status?: string
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              device_name?: string
+              platform?: string
+              device_uuid?: string
+              app_version?: string
+              status?: string
+              last_seen_at?: string
+              revoked_at?: string | null
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  revokeDevice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the device. */
+        device_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listEmployees: {
+    parameters: {
+      query?: {
+        /** @description active,on_leave,terminated. */
+        status?: string
+        /** @description Agencia base. */
+        agency_id?: number
+        /** @description Busca por documento o nombre. */
+        q?: string
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              person_id?: string | null
+              document_type?: string
+              document_number?: string
+              first_name?: string
+              last_name?: string
+              full_name?: string
+              email?: string
+              phone?: string
+              position?: string
+              agency_id?: number
+              hired_at?: string
+              terminated_at?: string | null
+              status?: string
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createEmployee: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          person_id?: number | null
+          /** @enum {string} */
+          document_type: 'DNI' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 50 characters. */
+          document_number: string
+          /** @description Must not be greater than 100 characters. */
+          first_name: string
+          /** @description Must not be greater than 100 characters. */
+          last_name: string
+          /** @description Must be a valid email address. Must not be greater than 150 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 80 characters. */
+          position: string
+          /** @description Must be at least 1. */
+          agency_id: number
+          /** @description Must be a valid date. */
+          hired_at: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>hired_at</code>. */
+          terminated_at?: string | null
+          /** @enum {string|null} */
+          status?: 'active' | 'on_leave' | 'terminated' | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              person_id?: string | null
+              document_type?: string
+              document_number?: string
+              first_name?: string
+              last_name?: string
+              full_name?: string
+              email?: string
+              phone?: string
+              position?: string
+              agency_id?: number
+              hired_at?: string
+              terminated_at?: string | null
+              status?: string
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestEmployeeDetails: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the employee. */
+        employee_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              person_id?: string | null
+              document_type?: string
+              document_number?: string
+              first_name?: string
+              last_name?: string
+              full_name?: string
+              email?: string
+              phone?: string
+              position?: string
+              agency_id?: number
+              hired_at?: string
+              terminated_at?: string | null
+              status?: string
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  modifyEmployee: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the employee. */
+        employee_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          person_id?: number | null
+          /** @enum {string} */
+          document_type: 'DNI' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 50 characters. */
+          document_number: string
+          /** @description Must not be greater than 100 characters. */
+          first_name: string
+          /** @description Must not be greater than 100 characters. */
+          last_name: string
+          /** @description Must be a valid email address. Must not be greater than 150 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 80 characters. */
+          position: string
+          /** @description Must be at least 1. */
+          agency_id: number
+          /** @description Must be a valid date. */
+          hired_at: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>hired_at</code>. */
+          terminated_at?: string | null
+          /** @enum {string|null} */
+          status?: 'active' | 'on_leave' | 'terminated' | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              person_id?: string | null
+              document_type?: string
+              document_number?: string
+              first_name?: string
+              last_name?: string
+              full_name?: string
+              email?: string
+              phone?: string
+              position?: string
+              agency_id?: number
+              hired_at?: string
+              terminated_at?: string | null
+              status?: string
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  deactivateEmployee: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the employee. */
+        employee_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listUsers: {
+    parameters: {
+      query?: {
+        /** @description active,suspended,inactive. */
+        status?: string
+        /** @description Busca por nombre o email. */
+        q?: string
+        /** @description Usuarios con esa agencia en su ámbito. */
+        agency_id?: number
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 150 characters. */
+          name: string
+          /** @description Must be a valid email address. Must not be greater than 150 characters. */
+          email: string
+          password: string
+          /** @description The <code>id</code> of an existing record in the employees table. */
+          employee_id?: number | null
+          must_change_password?: boolean
+          /** @description The <code>name</code> of an existing record in the roles table. */
+          roles?: string[]
+          /** @description The <code>id</code> of an existing record in the agencies table. */
+          agency_ids?: number[]
+          primary_agency_id?: number | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestUserDetails: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  modifyUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 150 characters. */
+          name?: string
+          /** @description Must be a valid email address. Must not be greater than 150 characters. */
+          email?: string
+          /** @description The <code>id</code> of an existing record in the employees table. */
+          employee_id?: number | null
+          must_change_password?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  suspendUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  changeUserStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status: 'active' | 'suspended' | 'inactive'
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  unlockUser: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  assignAgencyScope: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the user. */
+        user_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description The <code>id</code> of an existing record in the agencies table. */
+          agency_ids?: number[]
+          primary_agency_id?: number | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              name?: string
+              email?: string
+              status?: string
+              employee_id?: string | null
+              must_change_password?: boolean
+              failed_login_attempts?: number
+              locked_until?: string | null
+              last_login_at?: string | null
+              roles?: unknown[]
+              agencies?: unknown[]
               created_at?: string
             }
             success?: string
