@@ -4,6 +4,7 @@ import type { RouteLocationNormalized } from 'vue-router'
 
 import * as authApi from '@/core/api/auth'
 import { ApiError } from '@/core/api/errors'
+import { useAuthStore } from '@/core/stores/auth'
 import { authGuard } from '@/router/guard'
 import type { MeResponse } from '@/core/api/types'
 
@@ -63,12 +64,12 @@ describe('guard de sesión', () => {
     })
   })
 
-  it('deja pasar las rutas públicas sin sesión', async () => {
-    vi.mocked(authApi.me).mockRejectedValue(new ApiError('Unauthenticated.', 401))
-
+  it('deja pasar las rutas públicas sin preguntar al backend', async () => {
     await expect(
       authGuard(route({ name: 'login', path: '/auth/login', meta: { requiresAuth: false } })),
     ).resolves.toBe(true)
+
+    expect(authApi.me).not.toHaveBeenCalled()
   })
 
   it('deja pasar las rutas protegidas con sesión', async () => {
@@ -77,12 +78,18 @@ describe('guard de sesión', () => {
     await expect(authGuard(route({ meta: { requiresAuth: true } }))).resolves.toBe(true)
   })
 
-  it('saca del login a quien ya tiene sesión', async () => {
+  it('saca del login a quien ya tiene sesión en memoria', async () => {
     vi.mocked(authApi.me).mockResolvedValue(SESSION)
+
+    // La sesión se conoce tras entrar en una ruta protegida; en el login el
+    // guard no vuelve a preguntar al backend.
+    const store = useAuthStore()
+    await store.fetchMe()
 
     await expect(
       authGuard(route({ name: 'login', path: '/auth/login', meta: { requiresAuth: false } })),
     ).resolves.toEqual({ name: 'dashboard' })
+    expect(authApi.me).toHaveBeenCalledTimes(1)
   })
 
   it('no entra en una ruta cuyo permiso no tiene', async () => {

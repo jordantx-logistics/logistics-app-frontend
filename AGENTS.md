@@ -69,9 +69,9 @@ src/
 
 `src/router/guard.ts`, aplicado en `router.beforeEach`:
 
-1. `await auth.ensureSession()` (una vez por carga de página). Si el backend no responde, se trata como **sin sesión** (`forgetSession()`) en vez de abortar la navegación: la app se quedaría en blanco.
+1. `await auth.ensureSession()` (una vez por carga de página) **solo en rutas protegidas**: en las públicas (login, recuperar contraseña) no se pregunta al backend. Si el backend no responde, se trata como **sin sesión** (`forgetSession()`) en vez de abortar la navegación: la app se quedaría en blanco.
 2. Ruta protegida sin sesión → `login` con `?redirect=<fullPath>` (menos `/`, que no lo lleva).
-3. Ruta pública con sesión yendo a `login` → `dashboard`.
+3. Ruta pública con sesión **conocida** yendo a `login` → `dashboard` (sin volver a llamar a `/auth/me`).
 4. `meta.permission` que el usuario no tiene → `dashboard`. Esto es **presentación**: la autorización real la hace el backend con `permission:` en cada ruta.
 
 `meta` está aumentado en `guard.ts` (`requiresAuth`, por defecto `true`; `permission`). Rutas por **nombre**, no por path.
