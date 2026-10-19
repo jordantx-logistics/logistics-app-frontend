@@ -12,18 +12,19 @@ export default [
     meta: { requiresAuth: false },
   },
   {
-    // El enlace del correo apunta a `<FRONTEND_URL>/reset-password?token=…&email=…`
-    // (`ResetPassword::createUrlUsing` en el backend), así que la ruta canónica
-    // cuelga de la raíz, no de `/auth`.
-    path: '/reset-password',
+    // El enlace del correo apunta a `<FRONTEND_URL>/auth/reset-password?token=…&email=…`
+    // (`ResetPassword::createUrlUsing` en el backend), igual que el resto de
+    // las pantallas de sesión.
+    path: '/auth/reset-password',
     name: 'resetPassword',
     component: () => import('./pages/ResetPassword.vue'),
     meta: { requiresAuth: false },
   },
   {
-    // Compatibilidad: la ruta también existe bajo `/auth/…`, como el resto de
-    // las pantallas de sesión (enlaces antiguos, o si el backend cambia).
-    path: '/auth/reset-password',
+    // Compatibilidad: los correos de recuperación enviados antes del cambio
+    // apuntaban a `/reset-password` (en la raíz, sin `/auth`). Queda de alias
+    // hasta que esos enlaces expiren solos.
+    path: '/reset-password',
     redirect: { name: 'resetPassword' },
   },
 ]
