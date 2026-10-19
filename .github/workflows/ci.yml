@@ -57,5 +57,27 @@ jobs:
       - name: Tests (Vitest)
         run: pnpm test:unit
 
+      # El contrato OpenAPI va versionado en el repo del backend (criterio 10
+      # de la Fase 1): un checkout adicional trae esa copia (`develop`, el ref
+      # que alimenta staging) y `pnpm gen:api` deriva de ella. Si el resultado
+      # difiere de lo commiteado en `src/core/api/generated/`, el build falla —
+      # o el contrato cambió sin regenerar tipos, o la derivación se tocó a mano.
+      - name: Checkout del backend (contrato versionado)
+        uses: actions/checkout@v7
+        with:
+          repository: jordantx-logistics/logistics-app-backend
+          ref: develop
+          path: logistics-app-backend
+
+      - name: Contrato sin deriva (gen:api + diff)
+        env:
+          CONTRACT_PATH: logistics-app-backend/openapi/openapi.yaml
+        run: |
+          pnpm gen:api
+          git diff --exit-code -- src/core/api/generated || {
+            echo "::error::Deriva del contrato: regenera los tipos con 'pnpm gen:api' (no edites 'src/core/api/generated/' a mano) y commitea el resultado."
+            exit 1
+          }
+
       - name: Build (Vite)
         run: pnpm build-only

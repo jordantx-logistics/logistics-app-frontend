@@ -2,55 +2,50 @@
 /**
  * Genera los tipos TypeScript del contrato OpenAPI del backend (ADR-0008).
  *
- * El contrato no se versiona en este repo: se descarga del backend en vivo
- * (`GET /docs.openapi`, que sirve el último `scribe:generate`). Antes de
- * ejecutarlo, el backend tiene que estar levantado y con la documentación
- * regenerada:
+ * La fuente es la copia **versionada** del contrato:
+ * `openapi/openapi.yaml` del repo `logistics-app-backend` (criterio 10 de la
+ * Fase 1). Ya no hace falta el backend levantado ni descargar el vivo: la copia
+ * es canónica — el CI del backend garantiza que coincide con su código — y el
+ * CI de este repo compara la derivación de abajo contra lo que está commiteado
+ * (falla si hay deriva, o sea: si `openapi.d.ts` no se regeneró o se tocó a mano).
  *
- *   cd ../logistics-app-backend
- *   docker compose exec app php artisan scribe:generate
- *
- *   cd ../logistics-app-frontend
  *   pnpm gen:api
  *
- * La URL del backend sale de `VITE_API_URL` (`.env`) y, si no está definida,
- * del valor por defecto de `src/core/api/config.ts` (`http://localhost:8000`).
+ * La ruta por defecto es el repo hermano (`../logistics-app-backend/…`); la
+ * variable `CONTRACT_PATH` la cambia — el CI de este repo hace un checkout
+ * adicional del backend y apunta ahí.
  */
-import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname, resolve } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join, resolve } from 'node:path'
 
 import openapiTS, { astToString } from 'openapi-typescript'
-import { loadEnv } from 'vite'
 
-const DEFAULT_API_URL = 'http://localhost:8000'
+const DEFAULT_CONTRACT = resolve(
+  process.cwd(),
+  '..',
+  'logistics-app-backend',
+  'openapi',
+  'openapi.yaml',
+)
+const CONTRACT = process.env.CONTRACT_PATH ? resolve(process.env.CONTRACT_PATH) : DEFAULT_CONTRACT
 const OUTPUT = resolve('src/core/api/generated/openapi.d.ts')
-
-// `loadEnv` solo expone lo que empieza por el prefijo indicado (`VITE_`), que
-// es justo lo que puede acabar en el navegador. `process.env` manda, para
-// poder apuntar a otro backend sin tocar `.env` (`VITE_API_URL=... pnpm gen:api`).
-const fileEnv = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), 'VITE_')
-const baseUrl = (process.env.VITE_API_URL ?? fileEnv.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/+$/, '')
-const contractUrl = `${baseUrl}/docs.openapi`
 
 let contract
 try {
-  const response = await fetch(contractUrl)
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} ${response.statusText}`)
-  }
-  contract = await response.text()
+  contract = await readFile(CONTRACT, 'utf8')
 } catch (cause) {
-  console.error(`No se pudo descargar el contrato OpenAPI de ${contractUrl}`)
+  console.error(`No se pudo leer el contrato OpenAPI en ${CONTRACT}`)
   console.error(`  ${cause instanceof Error ? cause.message : String(cause)}`)
   console.error('')
-  console.error('Levanta el backend y regenera la documentación:')
-  console.error('  cd ../logistics-app-backend')
-  console.error('  docker compose up -d app')
+  console.error('El backend lo versiona en `openapi/openapi.yaml` (repo logistics-app-backend).')
+  console.error('Si falta, regenerarlo en ese repo:')
   console.error('  docker compose exec app php artisan scribe:generate')
+  console.error('  docker compose exec app sh scripts/contract-sync.sh')
   process.exit(1)
 }
 
-// `openapiTS` acepta el YAML/JSON tal cual y devuelve un AST; `astToString` lo
+// `openapiTS` acepta el YAML tal cual y devuelve un AST; `astToString` lo
 // convierte en el `.d.ts`. El encabezado lo añadimos nosotros: deja claro que
 // el archivo no se edita a mano y cómo se regenera.
 const ast = await openapiTS(contract)
@@ -58,9 +53,12 @@ const header = [
   '/**',
   ' * GENERADO — NO EDITAR A MANO.',
   ' *',
-  ' * Tipos del contrato OpenAPI del backend (`GET /docs.openapi`).',
-  ` * Generado con \`pnpm gen:api\` desde ${contractUrl}`,
-  ' * Ver `spec/09-decisiones/ADR-0008-openapi-tipos-generados.md`.',
+  ' * Tipos del contrato OpenAPI del backend, versionado en',
+  ' * `openapi/openapi.yaml` del repo `logistics-app-backend` (criterio 10 de',
+  ' * la Fase 1; ADR-0008): el CI compara esta derivación contra el contrato',
+  ' * commiteado y falla si hay deriva. Regenerar con `pnpm gen:api` (la ruta',
+  ' * concreta la fija `CONTRACT_PATH`; en el CI, el checkout adicional del',
+  ' * repo backend).',
   ' */',
   '',
   '',
@@ -68,5 +66,19 @@ const header = [
 
 await mkdir(dirname(OUTPUT), { recursive: true })
 await writeFile(OUTPUT, header + astToString(ast), 'utf8')
+
+// El `.d.ts` está versionado y `oxfmt` también lo formatea (`oxfmt src/`), así
+// que la derivación formateada aquí DEBE coincidir con el commiteado: sin este
+// paso, el chequeo de deriva del CI apuntaría una deriva falsa solo por formato.
+// En Windows el `.bin/oxfmt.cmd` solo corre bajo `cmd /c`; en Linux/macOS, directo.
+const binDir = join(process.cwd(), 'node_modules', '.bin')
+const result =
+  process.platform === 'win32'
+    ? spawnSync('cmd.exe', ['/c', join(binDir, 'oxfmt.cmd'), OUTPUT], { stdio: 'inherit' })
+    : spawnSync(join(binDir, 'oxfmt'), [OUTPUT], { stdio: 'inherit' })
+if (result.status !== 0) {
+  console.error('oxfmt no pudo formatear el archivo generado.')
+  process.exit(result.status ?? 1)
+}
 
 console.log(`Tipos generados en ${OUTPUT.replace(`${process.cwd()}\\`, '').replace(`${process.cwd()}/`, '')}`)

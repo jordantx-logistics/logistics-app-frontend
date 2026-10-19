@@ -18,16 +18,19 @@ El frontend se ejecuta **con `pnpm` del host** (`engines.node: ^22.18.0 || >=24.
 - `pnpm dev` — servidor de Vite en `http://localhost:5173`.
 - `pnpm check` — **lo mismo que el CI**, en orden: `format:check`, `check:lint`, `type-check`, `test:unit`, `build-only`. Es la comprobación que hay que dejar en verde antes de decir que algo está hecho.
 - `pnpm format` / `pnpm lint` — arreglan en sitio (`oxfmt src/`, `oxlint --fix`, `eslint --fix`); escriben, no solo comprueban.
-- `pnpm gen:api` — regenera `src/core/api/generated/openapi.d.ts` desde el contrato **en vivo** del backend (`GET /docs.openapi`). El backend tiene que estar levantado y con la documentación regenerada:
+- `pnpm gen:api` — regenera `src/core/api/generated/openapi.d.ts` desde el contrato **versionado** del backend (`openapi/openapi.yaml` del repo hermano; criterio 10 de la Fase 1). Ya no necesita el backend levantado:
 
   ```bash
-  # backend (Docker)
+  # solo si el contrato cambió (docblocks o rutas del backend)
+  cd ../logistics-app-backend
   docker compose exec app php artisan scribe:generate
-  # frontend
+  docker compose exec app php scripts/contract-sync.php
+
+  cd ../logistics-app-frontend
   pnpm gen:api
   ```
 
-  La URL sale de `VITE_API_URL` y, si no está, de `http://localhost:8000`. El contrato **no se versiona** en este repo, así que no hay comprobación de deriva todavía: tras tocar docblocks o rutas del backend, hay que regenerar a mano antes de usar los tipos nuevos.
+  La ruta por defecto es `../logistics-app-backend/openapi/openapi.yaml`; `CONTRACT_PATH` la puede apuntar a otro lado (el CI de este repo hace un checkout adicional del backend y la fija). Tras generar, el script formatea la salida con `oxfmt`, que es la misma representación que la versionada: si `git diff -- src/core/api/generated/` marca cambios tras `pnpm gen:api`, el contrato cambió sin regenerarlos. CI: ambos gates fallan — el del backend si su copia deja de coincidir con el código, el de aquí si la derivación difiere de lo commiteado (ADR-0008).
 - `pnpm test:unit` / `pnpm test:unit:watch` — Vitest (`src/**/__tests__/*.spec.ts`).
 - `pnpm test:e2e` — Playwright (`e2e/`, chromium por defecto). Necesita el backend local levantado para el recorrido de sesión; **no** se ejecuta en el CI.
 
@@ -45,10 +48,10 @@ src/
 └── router/               # index.ts (agrega rutas) y guard.ts (sesión y permisos)
 ```
 
-- Cada módulo expone su `routes.ts` (array de rutas, con `component: () => import('./index.vue')` para code-splitting) y su pantalla. `src/router/index.ts` los importa y concatena **a mano** hoy; el objetivo de la Fase 1 (paso 5.8) es descubrirlos por convención (`import.meta.glob`).
-- Los módulos con datos mock pendientes de conectar son `orders`, `customers`, `agencies`, `payments` y `permissions` (paso 5.6). Al conectar uno, se retiran sus mocks y sus tipos inventados de `core/types/index.ts`; `src/core/types/index.ts` se queda con lo que sea de UI (navegación, toasts, tema).
-- El sidebar (`core/components/Sidebar.vue`) tiene la navegación escrita a mano y sin filtrar por permisos; el spec pide que se derive de `can()`.
-- Estados de pantalla: el objetivo es `loading | error | empty | data` de forma uniforme (paso 5.7). Hoy solo existe `LoadingSpinner`; no dejes una tabla en blanco sin estado.
+- Cada módulo expone su `routes.ts` (array de rutas, con `component: () => import('./index.vue')` para code-splitting). `src/router/index.ts` los **descubre con `import.meta.glob`** (paso 5.8, Fase 1): un módulo nuevo queda registrado sin tocar el router; un test de router falla si la convención deja de registrar algo.
+- Los módulos consumen la API real (`core/api/<modulo>.ts`): `orders`, `customers`, `agencies` y `permissions` conectados; `payments` en *empty state* hasta que el backend exponga sus endpoints. Al conectar un módulo, se retiran sus mocks y sus tipos inventados de `core/types/index.ts`; `src/core/types/index.ts` se queda con lo que sea de UI (navegación, toasts, tema).
+- El sidebar (`core/components/Sidebar.vue`) deriva su navegación de la sesión y filtra cada entrada con `can()`.
+- Estados de pantalla: `loading | error | empty | data` con `ListState.vue` + `useAsyncData` (paso 5.7), que usan los cuatro listados. No dejes una tabla en blanco sin estado.
 
 ### Guard de sesión y permisos
 
