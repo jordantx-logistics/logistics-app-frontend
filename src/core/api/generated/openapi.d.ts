@@ -173,10 +173,67 @@ export interface paths {
     put?: never
     /**
      * Register Corporate Customer
-     * @description Creates a new company record, typically requiring RUC formatting and business names.
+     * @description Creates a new company **and** its customer aggregate (`customers`), so it can be used
+     *     as sender/receiver of an order. The RUC is validated (11 digits and check digit)
+     *     in the use case, which answers with an `error_code`.
      */
     post: operations['registerCorporateCustomer']
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/customers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Customers
+     * @description Returns customers, newest first, paginated with `page` and `per_page` (max 100).
+     *     `q` searches by display name, document number or email.
+     */
+    get: operations['listCustomers']
+    put?: never
+    /**
+     * Register Customer
+     * @description Creates the customer aggregate and its backing person or company in one transaction.
+     *     The document is unique per type and validated (RUC check digit included).
+     */
+    post: operations['registerCustomer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/customers/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    /** Show Customer */
+    get: operations['showCustomer']
+    /**
+     * Update Customer
+     * @description Updates contact data and the backing person/company. The document cannot be changed.
+     */
+    put: operations['updateCustomer']
+    post?: never
+    /**
+     * Deactivate Customer
+     * @description Soft-style deletion: sets `is_active = false`. Rejected with 409 while the
+     *     customer has pending, confirmed or in-transit orders.
+     */
+    delete: operations['deactivateCustomer']
     options?: never
     head?: never
     patch?: never
@@ -197,7 +254,9 @@ export interface paths {
     put?: never
     /**
      * Register Individual Customer
-     * @description Creates a new person record in the database using their personal document (e.g. DNI).
+     * @description Creates a new person **and** its customer aggregate (`customers`), so the person can
+     *     be used as sender/receiver of an order. Business rules (document format and
+     *     uniqueness) run in the use case and answer with an `error_code`.
      */
     post: operations['registerIndividualCustomer']
     delete?: never
@@ -486,6 +545,85 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/logistics/agency-coverages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Agency Coverages */
+    get: operations['listAgencyCoverages']
+    put?: never
+    /** Create Agency Coverage */
+    post: operations['createAgencyCoverage']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/agency-coverages/{coverage_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the coverage. */
+        coverage_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update Agency Coverage */
+    put: operations['updateAgencyCoverage']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Locations */
+    get: operations['listLocations']
+    put?: never
+    /** Create Location */
+    post: operations['createLocation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the location. */
+        id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Update Location
+     * @description Cambiar `zone_id` es cómo se reagrupa un distrito en otra zona de tarifa.
+     */
+    put: operations['updateLocation']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/logistics/orders': {
     parameters: {
       query?: never
@@ -505,6 +643,222 @@ export interface paths {
      *     Fires a background event when successful.
      */
     post: operations['createLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/by-ticket/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Show Logistics Order by ticket code */
+    get: operations['showLogisticsOrderByTicketCode']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    /** Show Logistics Order */
+    get: operations['showLogisticsOrder']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/quote': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Quote Logistics Order
+     * @description Calculates the price without persisting anything, using the same pricing engine and rules as order creation.
+     */
+    post: operations['quoteLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Confirm Logistics Order
+     * @description Confirms a pending order (`pending` -> `confirmed`) and freezes its price. Rejects any other transition with `INVALID_STATUS_TRANSITION`.
+     */
+    post: operations['confirmLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/cancel': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Cancel Logistics Order
+     * @description Cancels a pending or confirmed order. Only `pending` and `confirmed` orders can be cancelled.
+     */
+    post: operations['cancelLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/delivery': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update Logistics Order delivery
+     * @description Defines delivery while the order is still `pending` and re-quotes the price (delivery surcharge). Once confirmed, the price is immutable (`ORDER_ALREADY_CONFIRMED`).
+     */
+    patch: operations['updateLogisticsOrderDelivery']
+    trace?: never
+  }
+  '/api/v1/logistics/tariffs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Tariffs */
+    get: operations['listTariffs']
+    put?: never
+    /**
+     * Create Tariff
+     * @description Rechaza alcances incoherentes (`TARIFF_SCOPE_INVALID`), vigencias
+     *     invertidas (`TARIFF_VALIDITY_INVALID`), tramos solapados
+     *     (`TARIFF_BRACKETS_INVALID`) y tarifarios activos solapados del mismo
+     *     alcance (`TARIFF_OVERLAP`, 409).
+     */
+    post: operations['createTariff']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/tariffs/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    /** Show Tariff */
+    get: operations['showTariff']
+    /**
+     * Update Tariff
+     * @description El payload se funde con el tarifario actual antes de validar, y los
+     *     tramos se reemplazan en bloque (los enviados sustituyen a los anteriores).
+     */
+    put: operations['updateTariff']
+    post?: never
+    /** Deactivate Tariff */
+    delete: operations['deactivateTariff']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/zones': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Zones */
+    get: operations['listZones']
+    put?: never
+    /** Create Zone */
+    post: operations['createZone']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/zones/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the zone. */
+        id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update Zone */
+    put: operations['updateZone']
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -1027,6 +1381,302 @@ export interface operations {
               contact_email?: string
               contact_phone?: string
               created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listCustomers: {
+    parameters: {
+      query?: {
+        /** @description Search term (name, document or email). */
+        q?: string
+        /** @description Filter by type: person|company. */
+        customer_type?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, default 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string | null
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string | null
+              updated_at?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          customer_type: 'person' | 'company'
+          /** @description Must not be greater than 10 characters. */
+          document_type: string
+          /** @description Must not be greater than 20 characters. */
+          document_number: string
+          /** @description Must not be greater than 200 characters. */
+          display_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 255 characters. */
+          address?: string | null
+          /** @description Must be at least 0. */
+          credit_limit?: number | null
+          /** @description Must not be greater than 100 characters. */
+          first_name?: string
+          /** @description Must not be greater than 100 characters. */
+          last_name?: string
+          /** @description Must not be greater than 200 characters. */
+          business_name: string
+          /** @description Must not be greater than 200 characters. */
+          trade_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          contact_email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          contact_phone?: string | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string | null
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string | null
+              updated_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string | null
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string | null
+              updated_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 200 characters. */
+          display_name?: string
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 255 characters. */
+          address?: string | null
+          /** @description Must be at least 0. */
+          credit_limit?: number | null
+          /** @description Must not be greater than 100 characters. */
+          first_name?: string
+          /** @description Must not be greater than 100 characters. */
+          last_name?: string
+          /** @description Must not be greater than 200 characters. */
+          business_name?: string
+          /** @description Must not be greater than 200 characters. */
+          trade_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          contact_email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          contact_phone?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string | null
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string | null
+              updated_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  deactivateCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string | null
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string | null
+              updated_at?: string | null
             }
             success?: string
             message?: string
@@ -2027,6 +2677,320 @@ export interface operations {
       }
     }
   }
+  listAgencyCoverages: {
+    parameters: {
+      query?: {
+        /** @description Filter by agency. */
+        agency_id?: number
+        /** @description Filter by location. */
+        location_id?: number
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, default 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              agency_id?: string | null
+              location_id?: string | null
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAgencyCoverage: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          agency_id: number
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          location_id: number
+          allows_pickup?: boolean
+          allows_delivery?: boolean
+          /** @description Must be at least 0. */
+          delivery_surcharge?: number | null
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              agency_id?: string | null
+              location_id?: string | null
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateAgencyCoverage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the coverage. */
+        coverage_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          agency_id: number
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          location_id: number
+          allows_pickup?: boolean
+          allows_delivery?: boolean
+          /** @description Must be at least 0. */
+          delivery_surcharge?: number | null
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              agency_id?: string | null
+              location_id?: string | null
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listLocations: {
+    parameters: {
+      query?: {
+        /** @description Search by ubigeo, district, province or department. */
+        q?: string
+        /** @description Filter by zone. */
+        zone_id?: number
+        /** @description Filter by department. */
+        department?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..200, default 50). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ubigeo?: string | null
+              department?: string | null
+              province?: string | null
+              district?: string | null
+              zone_id?: string | null
+              is_active?: boolean
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be 6 characters. */
+          ubigeo: string
+          /** @description Must not be greater than 100 characters. */
+          department: string
+          /** @description Must not be greater than 100 characters. */
+          province: string
+          /** @description Must not be greater than 150 characters. */
+          district: string
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          zone_id: number
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ubigeo?: string | null
+              department?: string | null
+              province?: string | null
+              district?: string | null
+              zone_id?: string | null
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the location. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be 6 characters. */
+          ubigeo: string
+          /** @description Must not be greater than 100 characters. */
+          department: string
+          /** @description Must not be greater than 100 characters. */
+          province: string
+          /** @description Must not be greater than 150 characters. */
+          district: string
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          zone_id: number
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ubigeo?: string | null
+              department?: string | null
+              province?: string | null
+              district?: string | null
+              zone_id?: string | null
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
   listLogisticsOrders: {
     parameters: {
       query?: {
@@ -2052,8 +3016,27 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
               weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
               total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
               sender_id?: number
               receiver_id?: number
               origin_agency_id?: number
@@ -2111,6 +3094,19 @@ export interface operations {
           volume_m3?: number | null
           /** @description Must be at least 0. */
           declared_value?: number | null
+          /** @description standard,express. */
+          service_type?: string | null
+          /** @description sender,receiver. */
+          payment_responsibility?: string | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string | null
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+          /** @description Delivery address. */
+          recipient_address?: string | null
+          /** @description Delivery window (ISO 8601). */
+          delivery_scheduled_at?: string | null
+          requires_signature?: boolean
         }
       }
     }
@@ -2126,13 +3122,855 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
               weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
               total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
               sender_id?: number
               receiver_id?: number
               origin_agency_id?: number
               destination_agency_id?: number
               created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showLogisticsOrderByTicketCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  quoteLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          origin_agency_id: number
+          destination_agency_id: number
+          weight_kg: number
+          volume_m3?: number | null
+          /** @description standard,express. */
+          service_type?: string | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string | null
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+        }
+      }
+    }
+    responses: {
+      /** @description Cotizacion con tarifario */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              engine?: string
+              chargeable_weight_kg?: number
+              base_price?: number
+              weight_amount?: number
+              minimum_adjustment?: number
+              surcharge?: number
+              total_amount?: number
+              tariff_code?: string
+              breakdown?: {
+                engine?: string
+                total_amount?: number
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  confirmLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  cancelLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Cancellation reason. */
+          reason?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLogisticsOrderDelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          delivery_type: 'agency_pickup' | 'home_delivery'
+          /** @description This field is required when <code>delivery_type</code> is <code>home_delivery</code>. */
+          delivery_location_id?: number | null
+          /** @description This field is required when <code>delivery_type</code> is <code>home_delivery</code>. Must not be greater than 255 characters. */
+          recipient_address?: string | null
+          /** @description Must be a valid date. */
+          delivery_scheduled_at?: string | null
+          requires_signature?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: string | null
+              service_type?: string | null
+              payment_responsibility?: string | null
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string | null
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: string | null
+              delivery_attempts?: string | null
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listTariffs: {
+    parameters: {
+      query?: {
+        /** @description Search by code or name. */
+        q?: string
+        /** @description standard|express. */
+        service_type?: string
+        /** @description national|zone_pair|district_pair. */
+        scope_type?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, default 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 30 characters. */
+          code: string
+          /** @description Must not be greater than 150 characters. */
+          name: string
+          /** @enum {string} */
+          service_type: 'standard' | 'express'
+          /** @enum {string} */
+          scope_type: 'national' | 'zone_pair' | 'district_pair'
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          origin_zone_id?: number | null
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          destination_zone_id?: number | null
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          origin_location_id?: number | null
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          destination_location_id?: number | null
+          /** @description Must be at least 0. */
+          base_price: number
+          /** @description Must be at least 0. */
+          price_per_kg: number
+          /** @description Must be at least 0. */
+          price_per_m3?: number | null
+          /** @description Must be at least 0. */
+          min_charge: number
+          max_weight_kg: number
+          /** @description Must be at least 0. */
+          volumetric_factor?: number | null
+          priority?: number | null
+          /** @description Must be a valid date. */
+          valid_from: string
+          /** @description Must be a valid date. */
+          valid_to?: string | null
+          is_active?: boolean
+          brackets?: ({
+            /** @description Must be at least 0. */
+            from_kg: number
+            /** @description Must be at least 0. */
+            to_kg: number
+            /** @description Must be at least 0. */
+            fixed_fee: number
+            /** @description Must be at least 0. */
+            price_per_kg: number
+          } | null)[]
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 30 characters. */
+          code: string
+          /** @description Must not be greater than 150 characters. */
+          name: string
+          /** @enum {string} */
+          service_type: 'standard' | 'express'
+          /** @enum {string} */
+          scope_type: 'national' | 'zone_pair' | 'district_pair'
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          origin_zone_id?: number | null
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          destination_zone_id?: number | null
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          origin_location_id?: number | null
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          destination_location_id?: number | null
+          /** @description Must be at least 0. */
+          base_price: number
+          /** @description Must be at least 0. */
+          price_per_kg: number
+          /** @description Must be at least 0. */
+          price_per_m3?: number | null
+          /** @description Must be at least 0. */
+          min_charge: number
+          max_weight_kg: number
+          /** @description Must be at least 0. */
+          volumetric_factor?: number | null
+          priority?: number | null
+          /** @description Must be a valid date. */
+          valid_from: string
+          /** @description Must be a valid date. */
+          valid_to?: string | null
+          is_active?: boolean
+          brackets?: ({
+            /** @description Must be at least 0. */
+            from_kg: number
+            /** @description Must be at least 0. */
+            to_kg: number
+            /** @description Must be at least 0. */
+            fixed_fee: number
+            /** @description Must be at least 0. */
+            price_per_kg: number
+          } | null)[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  deactivateTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string | null
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listZones: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              is_active?: boolean
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createZone: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 20 characters. */
+          code: string
+          /** @description Must not be greater than 100 characters. */
+          name: string
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateZone: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the zone. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 20 characters. */
+          code: string
+          /** @description Must not be greater than 100 characters. */
+          name: string
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              code?: string
+              name?: string
+              is_active?: boolean
             }
             success?: string
             message?: string
@@ -2163,6 +4001,9 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
             }[]
             success?: string
@@ -2192,6 +4033,12 @@ export interface operations {
           phone?: string | null
           /** @description Must not be greater than 100 characters. */
           district?: string | null
+          /** @description Must not be greater than 100 characters. */
+          province?: string | null
+          /** @description Must not be greater than 100 characters. */
+          department?: string | null
+          /** @description Must be 6 characters. */
+          ubigeo?: string | null
           is_active?: boolean
         }
       }
@@ -2210,6 +4057,9 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
             }
             success?: string
@@ -2244,6 +4094,9 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
             }
             success?: string
@@ -2276,6 +4129,12 @@ export interface operations {
           phone?: string | null
           /** @description Must not be greater than 100 characters. */
           district?: string | null
+          /** @description Must not be greater than 100 characters. */
+          province?: string | null
+          /** @description Must not be greater than 100 characters. */
+          department?: string | null
+          /** @description Must be 6 characters. */
+          ubigeo?: string | null
           is_active?: boolean
         }
       }
@@ -2294,6 +4153,9 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
             }
             success?: string
