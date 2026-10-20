@@ -1416,8 +1416,8 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              code?: string | null
+              id?: number
+              code?: string
               customer_type?: string
               person_id?: number
               company_id?: string | null
@@ -1429,8 +1429,8 @@ export interface operations {
               address?: string | null
               is_active?: boolean
               credit_limit?: string | null
-              created_at?: string | null
-              updated_at?: string | null
+              created_at?: string
+              updated_at?: string
             }[]
             links?: {
               first?: string
@@ -1509,8 +1509,8 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              code?: string | null
+              id?: number
+              code?: string
               customer_type?: string
               person_id?: number
               company_id?: string | null
@@ -1522,8 +1522,8 @@ export interface operations {
               address?: string | null
               is_active?: boolean
               credit_limit?: string | null
-              created_at?: string | null
-              updated_at?: string | null
+              created_at?: string
+              updated_at?: string
             }
             success?: string
             message?: string
@@ -1551,8 +1551,8 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              code?: string | null
+              id?: number
+              code?: string
               customer_type?: string
               person_id?: number
               company_id?: string | null
@@ -1564,8 +1564,8 @@ export interface operations {
               address?: string | null
               is_active?: boolean
               credit_limit?: string | null
-              created_at?: string | null
-              updated_at?: string | null
+              created_at?: string
+              updated_at?: string
             }
             success?: string
             message?: string
@@ -1620,8 +1620,8 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              code?: string | null
+              id?: number
+              code?: string
               customer_type?: string
               person_id?: number
               company_id?: string | null
@@ -1633,8 +1633,8 @@ export interface operations {
               address?: string | null
               is_active?: boolean
               credit_limit?: string | null
-              created_at?: string | null
-              updated_at?: string | null
+              created_at?: string
+              updated_at?: string
             }
             success?: string
             message?: string
@@ -1662,8 +1662,8 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              code?: string | null
+              id?: number
+              code?: string
               customer_type?: string
               person_id?: number
               company_id?: string | null
@@ -1675,8 +1675,8 @@ export interface operations {
               address?: string | null
               is_active?: boolean
               credit_limit?: string | null
-              created_at?: string | null
-              updated_at?: string | null
+              created_at?: string
+              updated_at?: string
             }
             success?: string
             message?: string
@@ -2702,9 +2702,9 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              agency_id?: string | null
-              location_id?: string | null
+              id?: number
+              agency_id?: number
+              location_id?: number
               allows_pickup?: boolean
               allows_delivery?: boolean
               delivery_surcharge?: string
@@ -2767,9 +2767,9 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              agency_id?: string | null
-              location_id?: string | null
+              id?: number
+              agency_id?: number
+              location_id?: number
               allows_pickup?: boolean
               allows_delivery?: boolean
               delivery_surcharge?: string
@@ -2814,9 +2814,9 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              agency_id?: string | null
-              location_id?: string | null
+              id?: number
+              agency_id?: number
+              location_id?: number
               allows_pickup?: boolean
               allows_delivery?: boolean
               delivery_surcharge?: string
@@ -2858,12 +2858,12 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              ubigeo?: string | null
-              department?: string | null
-              province?: string | null
-              district?: string | null
-              zone_id?: string | null
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
               is_active?: boolean
             }[]
             links?: {
@@ -2926,12 +2926,12 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              ubigeo?: string | null
-              department?: string | null
-              province?: string | null
-              district?: string | null
-              zone_id?: string | null
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
               is_active?: boolean
             }
             success?: string
@@ -2976,12 +2976,12 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
-              ubigeo?: string | null
-              department?: string | null
-              province?: string | null
-              district?: string | null
-              zone_id?: string | null
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
               is_active?: boolean
             }
             success?: string
@@ -3016,9 +3016,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3027,12 +3027,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3122,9 +3122,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3133,12 +3133,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3178,9 +3178,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3189,12 +3189,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3235,9 +3235,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3246,12 +3246,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3344,9 +3344,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3355,12 +3355,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3408,9 +3408,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3419,12 +3419,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3479,9 +3479,9 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
-              version?: string | null
-              service_type?: string | null
-              payment_responsibility?: string | null
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
               description?: string
               weight_kg?: string
               volume_m3?: string
@@ -3490,12 +3490,12 @@ export interface operations {
               tariff_id?: string | null
               pricing_snapshot?: string | null
               total_amount?: string
-              delivery_type?: string | null
+              delivery_type?: string
               delivery_location_id?: string | null
               recipient_address?: string | null
               delivery_scheduled_at?: string | null
-              requires_signature?: string | null
-              delivery_attempts?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
               confirmed_at?: string | null
               cancelled_at?: string | null
               delivered_at?: string | null
@@ -3542,7 +3542,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               service_type?: string
@@ -3561,7 +3561,7 @@ export interface operations {
               valid_from?: string
               valid_to?: string | null
               is_active?: boolean
-              created_at?: string | null
+              created_at?: string
             }[]
             links?: {
               first?: string
@@ -3609,13 +3609,9 @@ export interface operations {
           service_type: 'standard' | 'express'
           /** @enum {string} */
           scope_type: 'national' | 'zone_pair' | 'district_pair'
-          /** @description The <code>id</code> of an existing record in the zones table. */
           origin_zone_id?: number | null
-          /** @description The <code>id</code> of an existing record in the zones table. */
           destination_zone_id?: number | null
-          /** @description The <code>id</code> of an existing record in the locations table. */
           origin_location_id?: number | null
-          /** @description The <code>id</code> of an existing record in the locations table. */
           destination_location_id?: number | null
           /** @description Must be at least 0. */
           base_price: number
@@ -3655,7 +3651,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               service_type?: string
@@ -3674,7 +3670,7 @@ export interface operations {
               valid_from?: string
               valid_to?: string | null
               is_active?: boolean
-              created_at?: string | null
+              created_at?: string
             }
             success?: string
             message?: string
@@ -3702,7 +3698,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               service_type?: string
@@ -3721,7 +3717,7 @@ export interface operations {
               valid_from?: string
               valid_to?: string | null
               is_active?: boolean
-              created_at?: string | null
+              created_at?: string
             }
             success?: string
             message?: string
@@ -3751,13 +3747,9 @@ export interface operations {
           service_type: 'standard' | 'express'
           /** @enum {string} */
           scope_type: 'national' | 'zone_pair' | 'district_pair'
-          /** @description The <code>id</code> of an existing record in the zones table. */
           origin_zone_id?: number | null
-          /** @description The <code>id</code> of an existing record in the zones table. */
           destination_zone_id?: number | null
-          /** @description The <code>id</code> of an existing record in the locations table. */
           origin_location_id?: number | null
-          /** @description The <code>id</code> of an existing record in the locations table. */
           destination_location_id?: number | null
           /** @description Must be at least 0. */
           base_price: number
@@ -3797,7 +3789,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               service_type?: string
@@ -3816,7 +3808,7 @@ export interface operations {
               valid_from?: string
               valid_to?: string | null
               is_active?: boolean
-              created_at?: string | null
+              created_at?: string
             }
             success?: string
             message?: string
@@ -3844,7 +3836,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               service_type?: string
@@ -3863,7 +3855,7 @@ export interface operations {
               valid_from?: string
               valid_to?: string | null
               is_active?: boolean
-              created_at?: string | null
+              created_at?: string
             }
             success?: string
             message?: string
@@ -3888,7 +3880,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               is_active?: boolean
@@ -3926,7 +3918,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               is_active?: boolean
@@ -3967,7 +3959,7 @@ export interface operations {
         content: {
           'application/json': {
             data?: {
-              id?: string | null
+              id?: number
               code?: string
               name?: string
               is_active?: boolean
