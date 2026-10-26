@@ -15,6 +15,12 @@ import {
   UserRound,
   Clock,
   Smartphone,
+  Package,
+  Truck,
+  Warehouse,
+  ScanLine,
+  MapPin,
+  ClipboardList,
 } from 'lucide-vue-next'
 
 import { useAuth } from '@/core/composables/useAuth'
@@ -51,6 +57,47 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { label: 'Dashboard', icon: 'LayoutDashboard', path: '/dashboard' },
       { label: 'Orders', icon: 'ShoppingCart', path: '/orders', permission: 'orders.view' },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      {
+        label: 'Shipments',
+        icon: 'Package',
+        path: '/operations/shipments',
+        permission: 'shipments.view',
+      },
+      {
+        label: 'Reception',
+        icon: 'ClipboardList',
+        path: '/operations/reception',
+        permission: 'shipments.receive',
+      },
+      {
+        label: 'Embarks',
+        icon: 'Truck',
+        path: '/operations/embarks',
+        permission: 'shipments.view',
+      },
+      {
+        label: 'Inventory',
+        icon: 'Warehouse',
+        path: '/operations/inventory',
+        permission: 'inventory.manage',
+      },
+      {
+        label: 'Tracking',
+        icon: 'ScanLine',
+        path: '/operations/tracking',
+        permission: 'tracking.view',
+      },
+      {
+        label: 'Deliveries',
+        icon: 'MapPin',
+        path: '/operations/deliveries',
+        permission: 'delivery.view',
+      },
     ],
   },
   {
@@ -108,6 +155,12 @@ type Icon =
   | typeof UserRound
   | typeof Clock
   | typeof Smartphone
+  | typeof Package
+  | typeof Truck
+  | typeof Warehouse
+  | typeof ScanLine
+  | typeof MapPin
+  | typeof ClipboardList
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -121,6 +174,12 @@ const iconMap: Record<string, Icon> = {
   UserRound,
   Clock,
   Smartphone,
+  Package,
+  Truck,
+  Warehouse,
+  ScanLine,
+  MapPin,
+  ClipboardList,
 }
 
 function handleToggle() {

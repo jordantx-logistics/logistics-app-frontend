@@ -633,7 +633,7 @@ export interface paths {
     }
     /**
      * List Logistics Orders
-     * @description Returns the orders visible to the authenticated user, newest first, paginated with `page` and `per_page` (max 100).
+     * @description Returns the orders visible to the authenticated user, newest first, paginated with `page` and `per_page` (max 100). All filters are cumulative and never widen the agency scope.
      */
     get: operations['listLogisticsOrders']
     put?: never
@@ -685,7 +685,11 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /**
+     * Update Logistics Order
+     * @description Edits shipping and delivery data while the order is `pending` or `confirmed`. It cannot change sender, receiver, agencies, service or tariff. Weight, volume or delivery changes re-quote the order; identity changes after departure are rejected with `ORDER_NOT_EDITABLE`.
+     */
+    patch: operations['updateLogisticsOrder']
     trace?: never
   }
   '/api/v1/logistics/orders/quote': {
@@ -858,6 +862,362 @@ export interface paths {
     get?: never
     /** Update Zone */
     put: operations['updateZone']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List deliveries */
+    get: operations['listDeliveries']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    /** Show a delivery */
+    get: operations['showADelivery']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign shipments for delivery */
+    post: operations['assignShipmentsForDelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Start a delivery */
+    post: operations['startADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Complete a delivery
+     * @description Evidence is recorded as routes (`deliveries/...`); Fase 4 does not upload files.
+     */
+    post: operations['completeADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/fail': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Fail a delivery */
+    post: operations['failADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List embarks */
+    get: operations['listEmbarks']
+    put?: never
+    /** Create an embark */
+    post: operations['createAnEmbark']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks/{embark}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    /** Show an embark */
+    get: operations['showAnEmbark']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks/{embark}/disembark': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Disembark an embark */
+    post: operations['disembarkAnEmbark']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List inventory counts */
+    get: operations['listInventoryCounts']
+    put?: never
+    /** Open an inventory count */
+    post: operations['openAnInventoryCount']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts/{count}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    /** Show an inventory count */
+    get: operations['showAnInventoryCount']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts/{count}/finish': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Finish an inventory count */
+    post: operations['finishAnInventoryCount']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/receptions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List receptions */
+    get: operations['listReceptions']
+    put?: never
+    /**
+     * Receive shipments
+     * @description Registers one or more parcels at their origin agency. A shipment already
+     *     received with the same scan is reported as duplicated, not as an error.
+     */
+    post: operations['receiveShipments']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/shipments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List shipments */
+    get: operations['listShipments']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/shipments/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Show a shipment */
+    get: operations['showAShipment']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/agencies/{agency}/inventory': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Agency id. */
+        agency: number
+      }
+      cookie?: never
+    }
+    /**
+     * Agency inventory
+     * @description Shipments physically at the agency and not yet delivered, returned or cancelled.
+     */
+    get: operations['agencyInventory']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/scans/sync': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Synchronize PDA scans
+     * @description Accepts a batch of scans. Each item is processed independently and
+     *     returned as accepted, duplicated or rejected.
+     */
+    post: operations['synchronizePDAScans']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/tracking/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Look up a shipment timeline */
+    get: operations['lookUpAShipmentTimeline']
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -2998,12 +3358,77 @@ export interface operations {
         page?: number
         /** @description Rows per page (1..100, por defecto 15). */
         per_page?: number
+        /** @description One status or a comma-separated list (`pending,confirmed`). */
+        status?: string
+        /** @description Filter by origin agency. */
+        origin_agency_id?: number
+        /** @description Filter by destination agency. */
+        destination_agency_id?: number
+        /** @description Filter orders that touch this agency (origin or destination). */
+        agency?: number
+        /** @description date Filter orders created on or after this date (ISO 8601). */
+        created_from?: string
+        /** @description date Filter orders created on or before this date (ISO 8601). */
+        created_to?: string
+        /** @description Filter by sender customer id. */
+        sender_id?: number
+        /** @description Filter by receiver customer id. */
+        receiver_id?: number
+        /** @description Filter by sender document number. */
+        sender_document?: string
+        /** @description Sender document type (`DNI`, `RUC`, `CE`, `PASSPORT`). */
+        sender_document_type?: string
+        /** @description Filter by receiver document number. */
+        receiver_document?: string
+        /** @description Receiver document type (`DNI`, `RUC`, `CE`, `PASSPORT`). */
+        receiver_document_type?: string
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Exact or prefix ticket number. */
+        ticket_number?: string
+        /** @description Exact ticket code or ticket number prefix (shortcut). */
+        ticket?: string
       }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody?: never
+    requestBody?: {
+      content: {
+        'application/json': {
+          status?: string
+          /** @description Must be at least 1. */
+          origin_agency_id?: number
+          /** @description Must be at least 1. */
+          destination_agency_id?: number
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          /** @description Must be at least 1. */
+          sender_id?: number
+          /** @description Must be at least 1. */
+          receiver_id?: number
+          /** @description Must not be greater than 20 characters. */
+          sender_document?: string
+          /** @enum {string} */
+          sender_document_type?: 'DNI' | 'RUC' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 20 characters. */
+          receiver_document?: string
+          /** @enum {string} */
+          receiver_document_type?: 'DNI' | 'RUC' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket?: string
+          per_page?: number
+        }
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -3223,6 +3648,86 @@ export interface operations {
       cookie?: never
     }
     requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Order description. */
+          description?: string | null
+          /** @description Weight in kilograms. */
+          weight_kg?: number
+          /** @description Volume in cubic meters. */
+          volume_m3?: number | null
+          /** @description Declared value. */
+          declared_value?: number | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+          /** @description when delivery_type=home_delivery. */
+          recipient_address: string | null
+          /** @description Delivery date (ISO 8601). */
+          delivery_scheduled_at?: Record<string, never> | null
+          /** @description Whether the delivery requires a signature. */
+          requires_signature?: boolean
+        }
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -3966,6 +4471,1280 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  listDeliveries: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter by courier. */
+        courier_id?: number
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          courier_id?: number
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  assignShipmentsForDelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Delivery agency. */
+          agency_id: number
+          /** @description Courier employee id. */
+          courier_id: number
+          /** @description Shipment ids. */
+          shipment_ids: number[]
+        }
+      }
+    }
+    responses: {
+      /** @description Assigned */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              status?: string
+              attempt?: number
+            }[]
+          }
+        }
+      }
+    }
+  }
+  startADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  completeADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Recipient name. */
+          recipient_name: string
+          /** @description Recipient document. */
+          recipient_document: string
+          /** @description Signature route. */
+          signature_path: string
+          /** @description Photo route. */
+          photo_path: string
+          /** @description GPS latitude. */
+          latitude: number
+          /** @description GPS longitude. */
+          longitude: number
+          /** @description ISO 8601 capture time. */
+          captured_at: string
+        }
+      }
+    }
+    responses: {
+      /** @description Delivered */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              delivery?: {
+                id?: number
+                status?: string
+              }
+              order_id?: number
+              shipment_id?: number
+              already?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  failADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Reason. */
+          failure_reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listEmbarks: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by origin agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        departed_from?: string
+        /** @description date Filter up to this date. */
+        departed_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          departed_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>departed_from</code>. */
+          departed_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              driver_id?: number
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Origin agency. */
+          agency_id: number
+          /** @description Vehicle id. */
+          vehicle_id: number
+          /** @description Driver id. */
+          driver_id: number
+          /** @description Optional route reference. */
+          route_ref?: string | null
+          /** @description Optional ISO 8601 departure. */
+          departed_at?: string | null
+          /** @description Shipments in the manifest. */
+          items: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+            /** @description Must be a valid date. */
+            scanned_at?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              driver_id?: number
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+          }
+        }
+      }
+    }
+  }
+  showAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              driver_id?: number
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  disembarkAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency where the parcels are unloaded. */
+          agency_id: number
+          /** @description Optional ISO 8601 arrival. */
+          arrived_at?: string | null
+          /** @description Optional subset of tickets; omit to disembark the whole manifest. */
+          items?: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              embark_id?: number
+              arrived_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+            duplicated?: string
+          }
+        }
+      }
+    }
+  }
+  listInventoryCounts: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description `open` or `finished`. */
+        status?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @enum {string} */
+          status?: 'open' | 'finished'
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency to count. */
+          agency_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  finishAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Counted shipments. */
+          items: {
+            /** @description Shipment id. */
+            shipment_id: number
+            /** @description Whether the parcel was found. */
+            found: boolean
+            /** @description Required when the expected and found states differ. */
+            motive?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            expected?: string
+            found?: string
+            missing?: string
+            unexpected?: string
+          }
+        }
+      }
+    }
+  }
+  listReceptions: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        received_from?: string
+        /** @description date Filter up to this date. */
+        received_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          received_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>received_from</code>. */
+          received_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              received_by?: number
+              received_at?: string
+              status?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  receiveShipments: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency where the parcels are received. */
+          agency_id: number
+          /** @description List of parcels. */
+          items: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+            /** @description Optional ISO 8601 timestamp. */
+            scanned_at?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              received_by?: number
+              received_at?: string
+              status?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+            duplicated?: string
+          }
+        }
+      }
+    }
+  }
+  listShipments: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter shipments touching this agency. */
+        agency?: number
+        /** @description Filter by origin agency. */
+        origin_agency_id?: number
+        /** @description Filter by destination agency. */
+        destination_agency_id?: number
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. */
+          origin_agency_id?: number
+          /** @description Must be at least 1. */
+          destination_agency_id?: number
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAShipment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  agencyInventory: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Ticket code or number prefix. */
+        search?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path: {
+        /** @description Agency id. */
+        agency: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must not be greater than 20 characters. */
+          search?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  synchronizePDAScans: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Optional device identifier. */
+          device_id?: string | null
+          /** @description Batch of scans. */
+          scans: {
+            /** @description Client-generated UUID (idempotency key). */
+            scan_id: string
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description One of reception, embark, disembark, inventory, out_for_delivery. `delivery` is reserved for the delivery endpoint. */
+            scan_type: string
+            /** @description ISO 8601 timestamp. */
+            scanned_at: string
+            /** @description Required for embark/disembark scans. */
+            embark_id?: number | null
+            /** @description Optional agency override. */
+            agency_id?: number | null
+            /** @description Optional GPS latitude. */
+            latitude?: number | null
+            /** @description Optional GPS longitude. */
+            longitude?: number | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                scan_id?: string
+                status?: string
+                shipment_id?: number
+                shipment_status?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  lookUpAShipmentTimeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Timeline */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              shipment_id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              events?: {
+                id?: number
+                event_type?: string
+                status?: string
+                agency_id?: number
+                scan_id?: string | null
+                meta?: Record<string, never>
+                created_at?: string
+              }[]
+            }
           }
         }
       }
