@@ -265,6 +265,501 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/finance/cash-closures': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List cash closures */
+    get: operations['listCashClosures']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Approve a cash closure */
+    post: operations['approveACashClosure']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reject a cash closure */
+    post: operations['rejectACashClosure']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/report': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    /** Download the cash closure report */
+    get: operations['downloadTheCashClosureReport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-movements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Register an expense or withdrawal
+     * @description Income movements are generated only by cash payments.
+     */
+    post: operations['registerAnExpenseOrWithdrawal']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/current': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Current open cash session
+     * @description Returns `cash_session: null` when the authenticated cashier has no open session.
+     */
+    get: operations['currentOpenCashSession']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List cash sessions */
+    get: operations['listCashSessions']
+    put?: never
+    /**
+     * Open a cash session
+     * @description The agency is inferred from the authenticated cashier; it is not accepted from the client.
+     */
+    post: operations['openACashSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/{session}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    /** Show a cash session */
+    get: operations['showACashSession']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/{session}/close': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Close a cash session
+     * @description A zero difference closes immediately. Any difference (tolerance 0.00) keeps the
+     *     session open and returns a pending closure that a supervisor must approve.
+     */
+    post: operations['closeACashSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List credit notes */
+    get: operations['listCreditNotes']
+    put?: never
+    /** Issue a credit note */
+    post: operations['issueACreditNote']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes/{creditNote}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+      }
+      cookie?: never
+    }
+    /** Show a credit note */
+    get: operations['showACreditNote']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes/{creditNote}/download/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download a credit note artifact */
+    get: operations['downloadACreditNoteArtifact']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List invoices */
+    get: operations['listInvoices']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    /** Show an invoice */
+    get: operations['showAnInvoice']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}/retry': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Retry SUNAT transmission */
+    post: operations['retrySUNATTransmission']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}/download/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download an invoice artifact */
+    get: operations['downloadAnInvoiceArtifact']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoice-series': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List invoice series */
+    get: operations['listInvoiceSeries']
+    put?: never
+    /** Create an invoice series */
+    post: operations['createAnInvoiceSeries']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoice-series/{series}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice series id. */
+        series: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update an invoice series */
+    put: operations['updateAnInvoiceSeries']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/orders/{order}/payment-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Order id. */
+        order: number
+      }
+      cookie?: never
+    }
+    /** Payment status of an order */
+    get: operations['paymentStatusOfAnOrder']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/payments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List payments */
+    get: operations['listPayments']
+    put?: never
+    /** Register a payment */
+    post: operations['registerAPayment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/payments/{payment}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Payment id. */
+        payment: number
+      }
+      cookie?: never
+    }
+    /** Show a payment */
+    get: operations['showAPayment']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List void requests */
+    get: operations['listVoidRequests']
+    put?: never
+    /** Request a void */
+    post: operations['requestAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    /** Show a void request */
+    get: operations['showAVoidRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Approve a void */
+    post: operations['approveAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reject a void */
+    post: operations['rejectAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/identity/attendance': {
     parameters: {
       query?: never
@@ -2121,6 +2616,1705 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  listCashClosures: {
+    parameters: {
+      query?: {
+        /** @description `pending`, `approved` or `rejected`. */
+        status?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  approveACashClosure: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  rejectACashClosure: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why the closure is rejected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadTheCashClosureReport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  registerAnExpenseOrWithdrawal: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description `expense` or `withdrawal`. */
+          type: string
+          /** @description Movement amount. */
+          amount: number
+          /** @description Reason. */
+          note: string
+          /** @description optional External reference type. */
+          reference_type?: string | null
+          /** @description optional External reference id. */
+          reference_id?: number | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              type?: string
+              amount?: string
+              signed_amount?: string
+              reference_type?: string | null
+              reference_id?: string | null
+              note?: string
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  currentOpenCashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json':
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string | null
+                    difference?: string | null
+                    opened_at?: string
+                    closed_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                }
+              }
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: string | null
+                }
+              }
+        }
+      }
+    }
+  }
+  listCashSessions: {
+    parameters: {
+      query?: {
+        /** @description `open` or `closed`. */
+        status?: string
+        /** @description Filter by cashier. */
+        cashier_id?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        opened_from?: string
+        /** @description date Filter up to this date. */
+        opened_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'open' | 'closed'
+          /** @description Must be at least 1. */
+          cashier_id?: number
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          opened_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>opened_from</code>. */
+          opened_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Opening cash. */
+          opening_amount: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  closeACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Counted cash. */
+          closing_amount: number
+          /** @description optional Cash count detail. */
+          count?: {
+            /** @description This field is required when <code>count</code> is present. Must be at least 0. */
+            denomination?: number
+            /** @description This field is required when <code>count</code> is present. Must be at least 0. */
+            quantity?: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json':
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    opened_at?: string
+                    closed_at?: string
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                  closure?: {
+                    id?: number
+                    cash_session_id?: number
+                    status?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    requested_by?: number
+                    approved_by?: string | null
+                    requested_at?: string
+                    approved_at?: string
+                    rejected_at?: string | null
+                    rejection_reason?: string | null
+                    created_at?: string
+                    report_url?: string | null
+                  }
+                  requires_approval?: boolean
+                }
+              }
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    opened_at?: string
+                    closed_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                  closure?: {
+                    id?: number
+                    cash_session_id?: number
+                    status?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    requested_by?: number
+                    approved_by?: string | null
+                    requested_at?: string
+                    approved_at?: string | null
+                    rejected_at?: string | null
+                    rejection_reason?: string | null
+                    created_at?: string
+                    report_url?: string | null
+                  }
+                  requires_approval?: boolean
+                }
+              }
+        }
+      }
+    }
+  }
+  listCreditNotes: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter by payment. */
+        payment_id?: number
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          payment_id?: number
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  issueACreditNote: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Payment to credit. */
+          payment_id: number
+          /** @description Credit amount. */
+          amount: number
+          /** @description SUNAT reason code (`01`, `02`, `03`, `06`, `07`). */
+          reason: string
+          /** @description optional Detail. */
+          note?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  showACreditNote: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadACreditNoteArtifact: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listInvoices: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description `boleta` or `factura`. */
+        document_type?: string
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        issued_from?: string
+        /** @description date Filter up to this date. */
+        issued_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must not be greater than 30 characters. */
+          ticket_number?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          issued_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>issued_from</code>. */
+          issued_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAnInvoice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  retrySUNATTransmission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnInvoiceArtifact: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listInvoiceSeries: {
+    parameters: {
+      query?: {
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description `boleta` or `factura`. */
+        document_type?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency_id?: number
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must match the regex /^[A-Z0-9]{4}$/. Must be 4 characters. */
+          series?: string
+          /** @description Must be 11 digits. */
+          issuer_ruc?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_name?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_trade_name?: string | null
+          /** @description Must not be greater than 255 characters. */
+          issuer_address?: string | null
+          /** @description Must be 6 digits. */
+          issuer_ubigeo?: string | null
+          /** @description Must be 4 characters. */
+          establishment_code?: string | null
+          is_active?: boolean
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAnInvoiceSeries: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency that issues. */
+          agency_id: number
+          /** @description `boleta` or `factura`. */
+          document_type: string
+          /** @description Four alphanumeric characters. */
+          series: string
+          /** @description Issuer RUC (11 digits). */
+          issuer_ruc: string
+          /** @description Legal name. */
+          issuer_name: string
+          /** @description optional Trade name. */
+          issuer_trade_name?: string | null
+          /** @description optional Fiscal address. */
+          issuer_address?: string | null
+          /** @description optional Six-digit ubigeo. */
+          issuer_ubigeo?: string | null
+          /** @description optional SUNAT establishment code. */
+          establishment_code?: string | null
+          /** @description optional Defaults to true. */
+          is_active?: boolean
+          /** @description optional Defaults to false. */
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  updateAnInvoiceSeries: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice series id. */
+        series: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency_id?: number
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must match the regex /^[A-Z0-9]{4}$/. Must be 4 characters. */
+          series?: string
+          /** @description Must be 11 digits. */
+          issuer_ruc?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_name?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_trade_name?: string | null
+          /** @description Must not be greater than 255 characters. */
+          issuer_address?: string | null
+          /** @description Must be 6 digits. */
+          issuer_ubigeo?: string | null
+          /** @description Must be 4 characters. */
+          establishment_code?: string | null
+          is_active?: boolean
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  paymentStatusOfAnOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Order id. */
+        order: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listPayments: {
+    parameters: {
+      query?: {
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description `cash` or `pos`. */
+        payment_method?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must not be greater than 20 characters. */
+          payment_method?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must not be greater than 30 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Order to charge. */
+          order_id: number
+          /** @description Payment amount (partial payments allowed). */
+          amount: number
+          /** @description optional ISO currency. */
+          currency?: string
+          /** @description `cash` or `pos`. */
+          payment_method: string
+          /** @description optional `boleta` or `factura`. */
+          document_type?: string | null
+          /** @description Client idempotency key. */
+          idempotency_key: string
+          /** @description optional Free-text reference (POS operation, voucher). */
+          reference?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Payment id. */
+        payment: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listVoidRequests: {
+    parameters: {
+      query?: {
+        /** @description `requested`, `approved` or `rejected`. */
+        status?: string
+        /** @description Filter by payment. */
+        payment_id?: number
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'requested' | 'approved' | 'rejected'
+          /** @description Must be at least 1. */
+          payment_id?: number
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Payment to void. */
+          payment_id: number
+          /** @description Why the payment is voided. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAVoidRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  approveAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  rejectAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why the void is rejected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
           }
         }
       }
