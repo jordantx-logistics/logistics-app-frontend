@@ -760,6 +760,373 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/fleet/drivers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List drivers */
+    get: operations['listDrivers']
+    put?: never
+    /** Register a driver */
+    post: operations['registerADriver']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/drivers/{driver}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Driver id. */
+        driver: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update a driver */
+    patch: operations['updateADriver']
+    trace?: never
+  }
+  '/api/v1/fleet/expenses': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List expenses */
+    get: operations['listExpenses']
+    put?: never
+    /**
+     * Register an expense
+     * @description Fuel requires the receipt and the liters. A per diem can add its receipt
+     *     later, but cannot be liquidated without it.
+     */
+    post: operations['registerAnExpense']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/expenses/{expense}/receipt': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    /** Download the receipt of an expense */
+    get: operations['downloadTheReceiptOfAnExpense']
+    put?: never
+    /** Attach a receipt to an expense */
+    post: operations['attachAReceiptToAnExpense']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/expenses/liquidate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Liquidate or reject expenses */
+    post: operations['liquidateOrRejectExpenses']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List routes */
+    get: operations['listRoutes']
+    put?: never
+    /** Plan a route */
+    post: operations['planARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    /** Show a route */
+    get: operations['showARoute']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/summary': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    /** Show the cost and consumption of a route */
+    get: operations['showTheCostAndConsumptionOfARoute']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/mileage/{log}/photo': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Mileage log id. */
+        log: number
+      }
+      cookie?: never
+    }
+    /** Download an odometer photo */
+    get: operations['downloadAnOdometerPhoto']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign a driver and a vehicle */
+    post: operations['assignADriverAndAVehicle']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/cancel': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Cancel a route */
+    post: operations['cancelARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Start a route
+     * @description Idempotent: starting a route already in progress has no further effects.
+     */
+    post: operations['startARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/segments/{segment}/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Segment id. */
+        segment: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Complete a segment */
+    post: operations['completeASegment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/finish': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Finish a route
+     * @description Idempotent: finishing a route already finished has no further effects.
+     */
+    post: operations['finishARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/mileage': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Register an odometer reading */
+    post: operations['registerAnOdometerReading']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List vehicles */
+    get: operations['listVehicles']
+    put?: never
+    /** Register a vehicle */
+    post: operations['registerAVehicle']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles/{vehicle}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Change the status of a vehicle */
+    patch: operations['changeTheStatusOfAVehicle']
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles/{vehicle}/odometer-correction': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Correct the odometer of a vehicle
+     * @description Audited correction: the only way for a reading to go backwards.
+     */
+    post: operations['correctTheOdometerOfAVehicle']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/identity/attendance': {
     parameters: {
       query?: never
@@ -4312,6 +4679,1206 @@ export interface operations {
               approved_at?: string | null
               rejected_at?: string | null
               rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listDrivers: {
+    parameters: {
+      query?: {
+        /** @description `active`, `inactive` or `suspended`. */
+        status?: string
+        /** @description Filter by home agency. */
+        agency?: number
+        /** @description Only active drivers with a valid license. */
+        available?: boolean
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'active' | 'inactive' | 'suspended'
+          /** @description Must be at least 1. */
+          agency?: number
+          available?: boolean
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerADriver: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description User account of the driver. */
+          user_id: number
+          /** @description License number. */
+          license_number: string
+          /** @description License category. */
+          license_category: string
+          /** @description Expiration date (`Y-m-d`). */
+          license_expires_at: string
+          /** @description optional Contact phone. */
+          phone?: string | null
+          /** @description Home agency. */
+          home_agency_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  updateADriver: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Driver id. */
+        driver: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description optional License number. */
+          license_number?: string
+          /** @description optional License category. */
+          license_category?: string
+          /** @description optional Expiration date (`Y-m-d`). */
+          license_expires_at?: string
+          /** @description optional Contact phone. */
+          phone?: string | null
+          /** @description optional `active`, `inactive` or `suspended`. */
+          status?: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listExpenses: {
+    parameters: {
+      query?: {
+        /** @description Filter by route. */
+        route_id?: number
+        /** @description `per_diem` or `fuel`. */
+        type?: string
+        /** @description `registered`, `liquidated` or `rejected`. */
+        status?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          route_id?: number
+          /** @enum {string} */
+          type?: 'per_diem' | 'fuel'
+          /** @enum {string} */
+          status?: 'registered' | 'liquidated' | 'rejected'
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description Route. */
+          route_id: number
+          /** @description `per_diem` or `fuel`. */
+          type: string
+          /** @description Amount in PEN. */
+          amount: number
+          /** @description optional Liters (fuel). */
+          liters?: number | null
+          /** @description optional Odometer reading. */
+          odometer_km?: number | null
+          /** @description optional Tolerates offline retries. */
+          idempotency_key?: string | null
+          /**
+           * Format: binary
+           * @description optional Receipt (jpg, png or pdf, up to 5 MB).
+           */
+          receipt?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadTheReceiptOfAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  attachAReceiptToAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * Format: binary
+           * @description Receipt (jpg, png or pdf, up to 5 MB).
+           */
+          receipt: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  liquidateOrRejectExpenses: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Expenses of closed routes. */
+          expense_ids: number[]
+          /** @description `liquidated` or `rejected`. */
+          decision: string
+          /** @description optional Required to reject. */
+          reason?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listRoutes: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Origin or destination agency. */
+        agency?: number
+        /** @description Filter by driver. */
+        driver_id?: number
+        /** @description Filter by vehicle. */
+        vehicle_id?: number
+        /** @description Exact route number. */
+        ticket_number?: string
+        /** @description Planned departure from. */
+        departure_from?: string
+        /** @description Planned departure to. */
+        departure_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 100 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. */
+          driver_id?: number
+          /** @description Must be at least 1. */
+          vehicle_id?: number
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          departure_from?: string
+          /** @description Must be a valid date. */
+          departure_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string
+              planned_departure_at?: string
+              planned_arrival_at?: string
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  planARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Origin agency. */
+          origin_agency_id: number
+          /** @description Destination agency. */
+          destination_agency_id: number
+          /** @description Planned departure. */
+          planned_departure_at: string
+          /** @description optional Planned arrival. */
+          planned_arrival_at?: string | null
+          /** @description Segments chaining origin to destination. */
+          segments: {
+            /** @description Segment start. */
+            from_agency_id: number
+            /** @description Segment end. */
+            to_agency_id: number
+            /** @description Distance in km. */
+            distance_km: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  showARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  showTheCostAndConsumptionOfARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              route_id?: number
+              km?: string
+              liters?: string
+              fuel_cost?: string
+              per_diem_cost?: string
+              total_cost?: string
+              km_per_liter?: number
+              cost_per_km?: number
+              is_anomalous?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnOdometerPhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Mileage log id. */
+        log: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  assignADriverAndAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Driver. */
+          driver_id: number
+          /** @description Vehicle. */
+          vehicle_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  cancelARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why it is cancelled. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  startARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Initial reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  completeASegment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Segment id. */
+        segment: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              route_id?: number
+              sequence?: number
+              from_agency_id?: number
+              to_agency_id?: number
+              distance_km?: string
+              status?: string
+              completed_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  finishARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Final reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  registerAnOdometerReading: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description Reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+          /** @description optional Tolerates offline retries. */
+          idempotency_key?: string | null
+          /**
+           * Format: binary
+           * @description optional Odometer photo (jpg, png or pdf, up to 5 MB).
+           */
+          photo?: string | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              route_id?: number
+              vehicle_id?: number
+              odometer_km?: string
+              recorded_at?: string
+              recorded_by?: number
+              has_photo?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  listVehicles: {
+    parameters: {
+      query?: {
+        /** @description `available`, `on_route`, `maintenance` or `inactive`. */
+        status?: string
+        /** @description Filter by owner agency. */
+        agency?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'available' | 'on_route' | 'maintenance' | 'inactive'
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Plate. */
+          plate: string
+          /** @description `truck`, `van` or `trailer`. */
+          type: string
+          /** @description Load capacity in kg. */
+          capacity_kg: number
+          /** @description Load capacity in m3. */
+          capacity_m3: number
+          /** @description Owner agency. */
+          owner_agency_id: number
+          /** @description optional Current odometer reading. */
+          odometer_km?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  changeTheStatusOfAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description `available`, `maintenance` or `inactive`. */
+          status: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  correctTheOdometerOfAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Correct reading. */
+          odometer_km: number
+          /** @description Why it is corrected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
               created_at?: string
               updated_at?: string
             }
