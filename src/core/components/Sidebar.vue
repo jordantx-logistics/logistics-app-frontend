@@ -21,6 +21,9 @@ import {
   ScanLine,
   MapPin,
   ClipboardList,
+  Wallet,
+  FileMinus2,
+  ReceiptText,
 } from 'lucide-vue-next'
 
 import { useAuth } from '@/core/composables/useAuth'
@@ -101,9 +104,32 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
+    label: 'Finance',
+    items: [
+      {
+        label: 'Payments',
+        icon: 'CreditCard',
+        path: '/finance/payments',
+        permission: 'payments.view',
+      },
+      { label: 'Cash', icon: 'Wallet', path: '/finance/cash', permission: 'cash.view' },
+      {
+        label: 'Credit notes',
+        icon: 'FileMinus2',
+        path: '/finance/credit-notes',
+        permission: 'credit-notes.view',
+      },
+      {
+        label: 'Invoices',
+        icon: 'ReceiptText',
+        path: '/finance/invoices',
+        permission: 'invoices.view',
+      },
+    ],
+  },
+  {
     label: 'Management',
     items: [
-      { label: 'Payments', icon: 'CreditCard', path: '/payments' },
       { label: 'Customers', icon: 'Users', path: '/customers', permission: 'customers.view' },
       { label: 'Agencies', icon: 'Building2', path: '/agencies', permission: 'agencies.view' },
     ],
@@ -161,6 +187,9 @@ type Icon =
   | typeof ScanLine
   | typeof MapPin
   | typeof ClipboardList
+  | typeof Wallet
+  | typeof FileMinus2
+  | typeof ReceiptText
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -180,6 +209,9 @@ const iconMap: Record<string, Icon> = {
   ScanLine,
   MapPin,
   ClipboardList,
+  Wallet,
+  FileMinus2,
+  ReceiptText,
 }
 
 function handleToggle() {

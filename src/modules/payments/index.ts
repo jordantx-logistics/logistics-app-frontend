@@ -1,8 +1,9 @@
 /**
  * Entrada pública del módulo **payments**.
  *
- * Por ahora el módulo solo tiene la pantalla (`pages/`): el backend no expone
- * endpoints de pagos, así que no hay `api/`, `types/` ni `stores/`. Cuando el
- * contrato los incluya, se agregan junto con `pnpm gen:api`.
+ * Expone el store, la api y los tipos; las pantallas y formularios quedan
+ * privados del módulo.
  */
-export {}
+export { usePaymentsStore } from './stores/usePaymentsStore'
+export * from './api'
+export * from './types/payments.types'
