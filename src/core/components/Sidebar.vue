@@ -24,6 +24,9 @@ import {
   Wallet,
   FileMinus2,
   ReceiptText,
+  Route as RouteIcon,
+  Fuel,
+  IdCard,
 } from 'lucide-vue-next'
 
 import { useAuth } from '@/core/composables/useAuth'
@@ -128,6 +131,15 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
+    label: 'Fleet',
+    items: [
+      { label: 'Routes', icon: 'RouteIcon', path: '/fleet/routes', permission: 'routes.view' },
+      { label: 'Expenses', icon: 'Fuel', path: '/fleet/expenses', permission: 'routes.view' },
+      { label: 'Drivers', icon: 'IdCard', path: '/fleet/drivers', permission: 'fleet.manage' },
+      { label: 'Vehicles', icon: 'Truck', path: '/fleet/vehicles', permission: 'fleet.manage' },
+    ],
+  },
+  {
     label: 'Management',
     items: [
       { label: 'Customers', icon: 'Users', path: '/customers', permission: 'customers.view' },
@@ -190,6 +202,9 @@ type Icon =
   | typeof Wallet
   | typeof FileMinus2
   | typeof ReceiptText
+  | typeof RouteIcon
+  | typeof Fuel
+  | typeof IdCard
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -212,6 +227,9 @@ const iconMap: Record<string, Icon> = {
   Wallet,
   FileMinus2,
   ReceiptText,
+  RouteIcon,
+  Fuel,
+  IdCard,
 }
 
 function handleToggle() {

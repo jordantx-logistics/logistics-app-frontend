@@ -1,0 +1,131 @@
+/* Estilos compartidos por las pantallas y formularios del módulo Flota. */
+
+.fleet-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fleet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fleet-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.fleet-subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.fleet-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fleet-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-secondary);
+}
+
+.fleet-filter select,
+.fleet-filter input {
+  min-width: 150px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.fleet-filter-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.fleet-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fleet-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border: none;
+  background: none;
+  color: #6366f1;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.fleet-link.danger {
+  color: var(--danger);
+}
+
+.fleet-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.fleet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fleet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fleet-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+}
+
+.fleet-form-error {
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.fleet-form-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.fleet-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .fleet-grid {
+    grid-template-columns: 1fr;
+  }
+}
