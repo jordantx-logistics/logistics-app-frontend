@@ -29,9 +29,9 @@ export function useCustomersTable() {
   const { can } = useAuth()
   const { success } = useToast()
 
-  const canSeeCompanies = computed(() => can('companies.view'))
-  const canCreatePerson = computed(() => can('persons.manage'))
-  const canCreateCompany = computed(() => can('companies.manage'))
+  const canSeeCompanies = computed(() => can('customers.view'))
+  const canCreatePerson = computed(() => can('customers.manage'))
+  const canCreateCompany = computed(() => can('customers.manage'))
 
   const tab = ref<Tab>('persons')
   const search = ref('')

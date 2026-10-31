@@ -11,8 +11,7 @@ export default [
     path: '/customers',
     name: 'customers',
     component: () => import('../pages/CustomersListPage.vue'),
-    // La pantalla tiene dos listados; basta con poder ver personas. La pestaña
-    // de empresas solo aparece con `companies.view` (se comprueba en el módulo).
-    meta: { requiresAuth: true, permission: 'persons.view' },
+    // Los dos listados (personas y empresas) exigen el mismo `customers.view`.
+    meta: { requiresAuth: true, permission: 'customers.view' },
   },
 ]

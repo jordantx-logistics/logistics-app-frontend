@@ -104,7 +104,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     label: 'Management',
     items: [
       { label: 'Payments', icon: 'CreditCard', path: '/payments' },
-      { label: 'Customers', icon: 'Users', path: '/customers', permission: 'persons.view' },
+      { label: 'Customers', icon: 'Users', path: '/customers', permission: 'customers.view' },
       { label: 'Agencies', icon: 'Building2', path: '/agencies', permission: 'agencies.view' },
     ],
   },

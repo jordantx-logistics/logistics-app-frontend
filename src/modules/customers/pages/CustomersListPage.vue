@@ -59,7 +59,7 @@ const {
 onMounted(() => {
   void persons.load()
 
-  // La pestaña de empresas solo existe con `companies.view`; sin permiso la
+  // La pestaña de empresas solo existe con `customers.view`; sin permiso la
   // petición daría 403, así que solo se carga cuando se puede ver.
   if (canSeeCompanies.value) {
     void companies.load()
