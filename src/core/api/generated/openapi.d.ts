@@ -999,6 +999,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/fleet/sync': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Sync a batch of fleet events
+     * @description Each event is applied on its own and reported as accepted, duplicated or
+     *     rejected. Events carrying a file use their multipart endpoint, with the
+     *     `event_id` as `idempotency_key`.
+     */
+    post: operations['syncABatchOfFleetEvents']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/fleet/routes/{route}/start': {
     parameters: {
       query?: never
@@ -1184,6 +1206,26 @@ export interface paths {
      * @description Consolidado diario por empleado (`attendance_days`), filtrable por empleado y rango de fechas.
      */
     get: operations['attendanceSummary']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/attendance/mine': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My Attendance
+     * @description Las marcaciones del empleado autenticado, de la más reciente a la más antigua.
+     */
+    get: operations['myAttendance']
     put?: never
     post?: never
     delete?: never
@@ -1973,6 +2015,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/operations/deliveries/{delivery}/evidence/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+        /** @description `signature` or `photo`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download delivery evidence */
+    get: operations['downloadDeliveryEvidence']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/operations/deliveries/assign': {
     parameters: {
       query?: never
@@ -1984,6 +2048,73 @@ export interface paths {
     put?: never
     /** Assign shipments for delivery */
     post: operations['assignShipmentsForDelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/route-sheet': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My route sheet
+     * @description The authenticated courier's open deliveries, with recipient and address. With
+     *     `updated_since` it returns the courier's deliveries changed after that moment,
+     *     closed ones included. A delivery reassigned to someone else no longer appears.
+     */
+    get: operations['myRouteSheet']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/batch': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Sync a batch of delivery events
+     * @description Each event is applied on its own and reported as accepted, duplicated or
+     *     rejected. Retrying an applied `event_id` never repeats the effect.
+     */
+    post: operations['syncABatchOfDeliveryEvents']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/evidence': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Upload delivery evidence
+     * @description Returns the route to send when completing the delivery. Retrying replaces the
+     *     file, so it never accumulates copies.
+     */
+    post: operations['uploadDeliveryEvidence']
     delete?: never
     options?: never
     head?: never
@@ -2024,7 +2155,7 @@ export interface paths {
     put?: never
     /**
      * Complete a delivery
-     * @description Evidence is recorded as routes (`deliveries/...`); Fase 4 does not upload files.
+     * @description Evidence is recorded as routes (`deliveries/...`), returned by the evidence upload.
      */
     post: operations['completeADelivery']
     delete?: never
@@ -5512,6 +5643,8 @@ export interface operations {
         departure_from?: string
         /** @description Planned departure to. */
         departure_to?: string
+        /** @description Only routes changed after this moment. */
+        updated_since?: string
         /** @description Rows per page (1..100). */
         per_page?: number
       }
@@ -5536,6 +5669,8 @@ export interface operations {
           departure_from?: string
           /** @description Must be a valid date. */
           departure_to?: string
+          /** @description Must be a valid date. */
+          updated_since?: string
           /** @description Must be at least 1. Must not be greater than 100. */
           per_page?: number
         }
@@ -5848,6 +5983,52 @@ export interface operations {
               computed_km?: string | null
               cancel_reason?: string | null
               created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  syncABatchOfFleetEvents: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Up to 25 events. */
+          items: {
+            /** @description Client-generated UUID. */
+            event_id: string
+            /** @description `route.start`, `route.finish`, `segment.complete`, `mileage` or `expense`. */
+            type: string
+            /** @description Route id. */
+            route_id: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                event_id?: string
+                status?: string
+              }[]
             }
           }
         }
@@ -6413,6 +6594,74 @@ export interface operations {
               late_minutes?: number
               status?: string
             }[]
+          }
+        }
+      }
+    }
+  }
+  myAttendance: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              employee_id?: number
+              agency_id?: number
+              type?: string
+              marked_at?: string
+              source?: string
+              device_id?: string | null
+              latitude?: string | null
+              longitude?: string | null
+              ip_address?: string
+              status?: string
+              idempotency_key?: string
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
           }
         }
       }
@@ -9221,6 +9470,31 @@ export interface operations {
       }
     }
   }
+  downloadDeliveryEvidence: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+        /** @description `signature` or `photo`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'text/plain': string
+        }
+      }
+    }
+  }
   assignShipmentsForDelivery: {
     parameters: {
       query?: never
@@ -9257,6 +9531,141 @@ export interface operations {
               status?: string
               attempt?: number
             }[]
+          }
+        }
+      }
+    }
+  }
+  myRouteSheet: {
+    parameters: {
+      query?: {
+        /** @description ISO 8601 cursor. */
+        updated_since?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be a valid date. */
+          updated_since?: string
+        }
+      }
+    }
+    responses: {
+      /** @description Route sheet */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              attempt?: number
+              recipient_name?: string
+              recipient_phone?: string
+              recipient_address?: string
+              requires_signature?: boolean
+              updated_at?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  syncABatchOfDeliveryEvents: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Up to 25 events. */
+          items: {
+            /** @description Client-generated UUID. */
+            event_id: string
+            /** @description `start`, `complete` or `fail`. */
+            action: string
+            /** @description Delivery id. */
+            delivery_id: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                event_id?: string
+                status?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  uploadDeliveryEvidence: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * @description `signature` or `photo`.
+           * @enum {string}
+           */
+          type: 'signature' | 'photo'
+          /**
+           * Format: binary
+           * @description Image (jpg or png, up to 5 MB). Must be a file. Must not be greater than 5120 kilobytes.
+           */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description Stored */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              path?: string
+            }
           }
         }
       }
@@ -9420,6 +9829,8 @@ export interface operations {
         page?: number
         /** @description Filter by origin agency. */
         agency?: number
+        /** @description date Only embarks changed after this moment. */
+        updated_since?: string
         /** @description date Filter from this date. */
         departed_from?: string
         /** @description date Filter up to this date. */
@@ -9436,6 +9847,8 @@ export interface operations {
         'application/json': {
           /** @description Must be at least 1. */
           agency?: number
+          /** @description Must be a valid date. */
+          updated_since?: string
           /** @description Must be a valid date. */
           departed_from?: string
           /** @description Must be a valid date. Must be a date after or equal to <code>departed_from</code>. */
@@ -10058,6 +10471,8 @@ export interface operations {
         ticket_number?: string
         /** @description date Filter from this date. */
         created_from?: string
+        /** @description date Only shipments changed after this moment. */
+        updated_since?: string
         /** @description date Filter up to this date. */
         created_to?: string
         /** @description Rows per page (1..100). */
@@ -10082,6 +10497,8 @@ export interface operations {
           ticket_code?: string
           /** @description Must not be greater than 20 characters. */
           ticket_number?: string
+          /** @description Must be a valid date. */
+          updated_since?: string
           /** @description Must be a valid date. */
           created_from?: string
           /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
