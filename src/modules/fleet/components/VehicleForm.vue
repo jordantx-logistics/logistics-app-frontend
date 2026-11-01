@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 
 import { ApiError } from '@/core/api/errors'
+import AgencySelect from '@/core/components/AgencySelect.vue'
 import Button from '@/core/components/Button.vue'
 import FormField from '@/core/components/FormField.vue'
 import Input from '@/core/components/Input.vue'
@@ -84,8 +85,8 @@ async function submit(): Promise<void> {
     </div>
 
     <div class="fleet-grid">
-      <FormField label="Owner agency ID" :error="error?.fieldError('owner_agency_id')">
-        <Input v-model="form.owner_agency_id" type="number" placeholder="1" />
+      <FormField label="Owner agency" :error="error?.fieldError('owner_agency_id')">
+        <AgencySelect v-model="form.owner_agency_id" aria-label="Owner agency" />
       </FormField>
 
       <FormField label="Current odometer (km)" :error="error?.fieldError('odometer_km')">

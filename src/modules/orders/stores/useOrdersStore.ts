@@ -14,8 +14,15 @@ export const useOrdersStore = defineStore('orders', () => {
   const PER_PAGE = 15
 
   const page = ref(1)
+  const status = ref('')
 
-  const orders = useAsyncData(() => ordersApi.listOrders({ page: page.value, per_page: PER_PAGE }))
+  const orders = useAsyncData(() =>
+    ordersApi.listOrders({
+      page: page.value,
+      per_page: PER_PAGE,
+      ...(status.value === '' ? {} : { status: status.value }),
+    }),
+  )
 
   /** Cambia de página y recarga del API (paginación del servidor). */
   function goToPage(next: number): void {
@@ -23,10 +30,19 @@ export const useOrdersStore = defineStore('orders', () => {
     void orders.load()
   }
 
+  /** Cambiar el filtro vuelve a la primera página. */
+  function filterByStatus(next: string): void {
+    status.value = next
+    page.value = 1
+    void orders.load()
+  }
+
   return {
     PER_PAGE,
     page,
+    status,
     orders,
     goToPage,
+    filterByStatus,
   }
 })

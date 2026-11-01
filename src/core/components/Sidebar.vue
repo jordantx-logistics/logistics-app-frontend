@@ -27,6 +27,10 @@ import {
   Route as RouteIcon,
   Fuel,
   IdCard,
+  TriangleAlert,
+  BarChart3,
+  Tags,
+  Map as MapIcon,
 } from 'lucide-vue-next'
 
 import { useAuth } from '@/core/composables/useAuth'
@@ -63,6 +67,13 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { label: 'Dashboard', icon: 'LayoutDashboard', path: '/dashboard' },
       { label: 'Orders', icon: 'ShoppingCart', path: '/orders', permission: 'orders.view' },
+      {
+        label: 'Incidents',
+        icon: 'TriangleAlert',
+        path: '/incidents',
+        permission: 'incidents.view',
+      },
+      { label: 'Reports', icon: 'BarChart3', path: '/reports', permission: 'reports.view' },
     ],
   },
   {
@@ -144,6 +155,8 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { label: 'Customers', icon: 'Users', path: '/customers', permission: 'customers.view' },
       { label: 'Agencies', icon: 'Building2', path: '/agencies', permission: 'agencies.view' },
+      { label: 'Tariffs', icon: 'Tags', path: '/tariffs', permission: 'tariffs.manage' },
+      { label: 'Zones', icon: 'Map', path: '/zones', permission: 'locations.manage' },
     ],
   },
   {
@@ -205,6 +218,10 @@ type Icon =
   | typeof RouteIcon
   | typeof Fuel
   | typeof IdCard
+  | typeof TriangleAlert
+  | typeof BarChart3
+  | typeof Tags
+  | typeof MapIcon
 
 const iconMap: Record<string, Icon> = {
   LayoutDashboard,
@@ -230,6 +247,10 @@ const iconMap: Record<string, Icon> = {
   RouteIcon,
   Fuel,
   IdCard,
+  TriangleAlert,
+  BarChart3,
+  Tags,
+  Map: MapIcon,
 }
 
 function handleToggle() {

@@ -1,4 +1,5 @@
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { useAuth } from '@/core/composables/useAuth'
 import type { Column } from '@/core/components/types'
@@ -11,8 +12,23 @@ import { useOrdersStore } from '../stores/useOrdersStore'
  * `stores/useOrdersStore.ts`.
  */
 
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+
+const STATUS_VARIANTS: Record<string, BadgeVariant> = {
+  pending: 'warning',
+  confirmed: 'info',
+  in_transit: 'info',
+  delivered: 'success',
+  cancelled: 'danger',
+}
+
+export function statusVariant(status: string): BadgeVariant {
+  return STATUS_VARIANTS[status] ?? 'neutral'
+}
+
 export function useOrdersTable() {
   const store = useOrdersStore()
+  const router = useRouter()
   const { can } = useAuth()
 
   const meta = computed(() => store.orders.data?.meta)
@@ -24,36 +40,26 @@ export function useOrdersTable() {
     { key: 'status', label: 'Status' },
     { key: 'weight_kg', label: 'Weight (kg)' },
     { key: 'total_amount', label: 'Amount' },
-    { key: 'sender_id', label: 'Sender' },
-    { key: 'receiver_id', label: 'Receiver' },
     { key: 'origin_agency_id', label: 'Origin' },
     { key: 'destination_agency_id', label: 'Destination' },
     { key: 'created_at', label: 'Created' },
+    { key: 'actions', label: '' },
   ]
 
-  type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
-
-  const STATUS_VARIANTS: Record<string, BadgeVariant> = {
-    pending: 'warning',
-    in_transit: 'info',
-    delivered: 'success',
-    cancelled: 'danger',
-    failed: 'danger',
-  }
-
-  function statusVariant(status: string): BadgeVariant {
-    return STATUS_VARIANTS[status] ?? 'neutral'
+  function openOrder(id: unknown): void {
+    void router.push({ name: 'order-detail', params: { id: String(id) } })
   }
 
   return {
     PER_PAGE: store.PER_PAGE,
+    store,
     orders: store.orders,
-    page: store.page,
     goToPage: store.goToPage,
     meta,
     rows,
     canCreate,
     columns,
     statusVariant,
+    openOrder,
   }
 }

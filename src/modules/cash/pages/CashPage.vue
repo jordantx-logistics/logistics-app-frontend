@@ -150,7 +150,7 @@ function closurePage(next: number): void {
 }
 
 onMounted(() => {
-  void store.loadAll()
+  void store.loadAll(can('cash.open'))
 })
 </script>
 
@@ -183,6 +183,7 @@ onMounted(() => {
       </div>
 
       <ListState
+        v-if="can('cash.open')"
         :status="store.current.status"
         :error="store.current.error"
         :empty="false"

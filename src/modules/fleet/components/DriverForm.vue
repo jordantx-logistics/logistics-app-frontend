@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 
 import { ApiError } from '@/core/api/errors'
+import AgencySelect from '@/core/components/AgencySelect.vue'
 import Button from '@/core/components/Button.vue'
 import FormField from '@/core/components/FormField.vue'
 import Input from '@/core/components/Input.vue'
@@ -84,8 +85,8 @@ async function submit(): Promise<void> {
         <Input v-model="form.user_id" type="number" placeholder="15" />
       </FormField>
 
-      <FormField label="Home agency ID" :error="error?.fieldError('home_agency_id')">
-        <Input v-model="form.home_agency_id" type="number" placeholder="1" />
+      <FormField label="Home agency" :error="error?.fieldError('home_agency_id')">
+        <AgencySelect v-model="form.home_agency_id" aria-label="Home agency" />
       </FormField>
     </div>
 

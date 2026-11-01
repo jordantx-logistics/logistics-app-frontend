@@ -110,6 +110,11 @@ export const useAuthStore = defineStore('auth', () => {
     return permissions.value.includes(permission)
   }
 
+  /** ¿Tiene alguno de los permisos? */
+  function canAny(candidates: string[]): boolean {
+    return candidates.some(can)
+  }
+
   /** ¿Tiene el rol? (`admin`, `counter`...) */
   function hasRole(role: string): boolean {
     return roles.value.includes(role)
@@ -133,6 +138,7 @@ export const useAuthStore = defineStore('auth', () => {
     logoutAll,
     forgetSession,
     can,
+    canAny,
     hasRole,
   }
 })

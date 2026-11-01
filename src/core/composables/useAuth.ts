@@ -42,6 +42,7 @@ export function useAuth() {
   return {
     authStore,
     can: authStore.can,
+    canAny: authStore.canAny,
     hasRole: authStore.hasRole,
     login: authStore.login,
     logout,

@@ -31,7 +31,22 @@ El frontend se ejecuta **con `pnpm` del host** (`engines.node: ^22.18.0 || >=24.
   La ruta por defecto es `../logistics-app-backend/openapi/openapi.yaml`; `CONTRACT_PATH` la puede apuntar a otro lado (el CI de este repo hace un checkout adicional del backend y la fija). Tras generar, el script formatea la salida con `oxfmt`, que es la misma representación que la versionada: si `git diff -- src/core/api/generated/` marca cambios tras `pnpm gen:api`, el contrato cambió sin regenerarlos. CI: ambos gates fallan — el del backend si su copia deja de coincidir con el código, el de aquí si la derivación difiere de lo commiteado (ADR-0008).
 - `pnpm gen:module <nombre>` — crea un módulo nuevo con la estructura autocontenida (api/, types/, stores/, composables/, pages/, components/, router/, __tests__/ y la entrada pública `index.ts`). Starter funcional: listado con los cuatro estados conectado a una api placeholder; los pasos que quedan a mano los imprime el script.
 - `pnpm test:unit` / `pnpm test:unit:watch` — Vitest (`src/**/__tests__/*.spec.ts`).
-- `pnpm test:e2e` — Playwright (`e2e/`, chromium por defecto). Necesita el backend local levantado para el recorrido de sesión; **no** se ejecuta en el CI.
+- `pnpm test:unit:coverage` — Vitest con el umbral del 70 % de líneas sobre la lógica (stores, composables, api, utilidades). Es lo que corre el CI.
+- `pnpm test:e2e` — Playwright (`e2e/`, chromium por defecto), smoke sin backend.
+- `pnpm test:e2e:flows` — flujos por actor y recorrido de permisos (`e2e/flows/`) contra el backend real, en un stack aislado que no toca los datos de desarrollo:
+
+  ```bash
+  cd ../logistics-app-backend
+  sh scripts/e2e-up.sh     # http://localhost:8100, base recién sembrada
+
+  cd ../logistics-app-frontend
+  pnpm test:e2e:flows      # levanta Vite en :5199
+
+  cd ../logistics-app-backend
+  sh scripts/e2e-down.sh   # borra el stack y sus volúmenes
+  ```
+
+  Comparten datos y corren en orden, así que hay que volver a ejecutar `e2e-up.sh` antes de repetirlos.
 
 ## Arquitectura
 
@@ -61,7 +76,9 @@ src/
 - **Cada módulo contiene su dominio**: las llamadas HTTP (`api/<dominio>.api.ts`), los tipos derivados del contrato (`types/<dominio>.types.ts`), el estado (`stores/use<Dominio>Store.ts`) y la lógica de pantalla (`composables/use<Dominio>Table.ts`). Lo que otro módulo puede consumir sale **solo** por `index.ts`; `components/` y `pages/` quedan privados.
 - **División de responsabilidades en las pantallas**: el store guarda listados y mutaciones (cada alta recarga del API), el composable arma la presentación (filtros, paginación, modal, toasts) y la página queda en el cableado del template. Ojo con los refs anidados: vía store de Pinia, `<listado>.data/status/error` llegan **ya desenvueltos** (`.value` sobra tanto en composables como en templates).
 - `modules/auth` es especial: solo contiene sus **páginas** (Login/Forgot/Reset) y su `api/auth.api.ts` (recuperación de contraseña y token para apps/PDA). El ciclo de sesión (login, `me`, logout) es transversal: vive en `core/stores/auth.ts` + `core/api/auth.ts` y lo usan el guard y el interceptor 401.
-- Todos los módulos consumen la API real, salvo `dashboard` y `settings`, que no tienen `api/` ni `stores/` y muestran datos de ejemplo hasta la Fase 7. Al conectar un módulo nuevo: tipos derivados del contrato en su `types/`, mocks retirados, y `core/types/index.ts` se queda solo con lo de UI.
+- Todos los módulos consumen la API real. Al conectar un módulo nuevo: tipos derivados del contrato en su `types/`, mocks retirados, y `core/types/index.ts` se queda solo con lo de UI.
+- Controles de `core/components`: `Input`, `Textarea` y `Toggle` son controlados (pintan `modelValue`); `Button` es `type="button"` salvo que se pida `type="submit"`, así que el envío de un formulario va con un único `type="submit"`, sin `@click`.
+- Permisos en la UI: `can()`/`canAny()` o `PermissionGate` para lo que depende del permiso; lo que depende del estado del recurso se **deshabilita**. `AgencySelect` (`core/components`) es el selector de agencia; `useAgencyOptionsStore` da los códigos para pintar en lugar de ids.
 - El sidebar (`core/components/Sidebar.vue`) deriva su navegación de la sesión y filtra cada entrada con `can()`.
 - Estados de pantalla: `loading | error | empty | data` con `ListState.vue` + `useAsyncData`, en todos los listados. No dejes una tabla en blanco sin estado.
 
@@ -123,9 +140,8 @@ Comportamiento de `client.ts`:
 
 - Unitarios: `src/**/__tests__/*.spec.ts`, entorno `jsdom`. `tsconfig.app.json` los excluye y `tsconfig.vitest.json` los incluye; `vue-tsc --build` comprueba ambos.
 - Los tests **mockean la capa API** (`vi.mock('@/modules/<m>/api')` en los módulos; `vi.mock('@/core/api/client')` para los interceptores) y no tocan la red. Hay tests de los specs por capa de cada módulo, del store de sesión y del guard, y de los interceptores (419/401/422, red).
-- E2E: `e2e/auth.spec.ts` es un smoke de sesión contra el backend local. El `baseURL` es `http://localhost:5173` en local y `4173` (preview) en CI; Playwright levanta el servidor solo si no hay uno en marcha.
-- El CI no ejecuta e2e ni necesita Docker: solo instala, formatea, lintea, tipa, testea y compila.
+- E2E: `e2e/auth.spec.ts` es un smoke sin backend; `e2e/flows/` son los flujos por actor (`actors.spec.ts`) y el recorrido de permisos (`permissions.spec.ts`), que falla si una pantalla ofrecida a un rol recibe un 403 del API.
 
 ## CI
 
-`.github/workflows/ci.yml` (ramas `develop` y `main`, push y PR): `pnpm install --frozen-lockfile` y, en pasos separados, `format:check`, `check:lint`, `type-check`, `test:unit` y `build-only`. Es el mismo orden que `pnpm check`; si local pasa y el CI falla, es por dependencias o el lockfile.
+`.github/workflows/ci.yml` (ramas `develop` y `main`, push y PR). El job de calidad hace `pnpm install --frozen-lockfile` y, en pasos separados, `format:check`, `check:lint`, `type-check`, `test:unit:coverage` y `build-only`: el mismo orden que `pnpm check`, con el umbral de cobertura. El job `e2e` clona el backend (`develop`), levanta el stack aislado y corre `test:e2e:flows`, así que depende de que el backend ya esté subido.

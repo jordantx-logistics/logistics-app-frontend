@@ -15,4 +15,17 @@ export default [
     // evita mandar a una pantalla que respondería 403 (es presentación).
     meta: { requiresAuth: true, permission: 'orders.view' },
   },
+  {
+    // Antes de `/orders/:id`: `new` no es un id.
+    path: '/orders/new',
+    name: 'order-create',
+    component: () => import('../pages/OrderCreatePage.vue'),
+    meta: { requiresAuth: true, permission: 'orders.create' },
+  },
+  {
+    path: '/orders/:id(\\d+)',
+    name: 'order-detail',
+    component: () => import('../pages/OrderDetailPage.vue'),
+    meta: { requiresAuth: true, permission: 'orders.view' },
+  },
 ]

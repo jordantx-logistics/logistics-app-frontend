@@ -30,8 +30,12 @@ export const useCashStore = defineStore('cash', () => {
   const sessions = useAsyncData(() => cashApi.listCashSessions(sessionsQuery.value))
   const closures = useAsyncData(() => cashApi.listCashClosures(closuresQuery.value))
 
-  async function loadAll(): Promise<void> {
-    await Promise.all([current.load(), sessions.load(), closures.load()])
+  /**
+   * La sesión propia exige `cash.open`: quien solo consulta (analista) ve el historial
+   * y no debe pedirla, porque respondería 403.
+   */
+  async function loadAll(withCurrent = true): Promise<void> {
+    await Promise.all([...(withCurrent ? [current.load()] : []), sessions.load(), closures.load()])
   }
 
   async function loadClosures(): Promise<void> {

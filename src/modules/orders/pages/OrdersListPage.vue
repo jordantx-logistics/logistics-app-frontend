@@ -1,32 +1,67 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import { Plus, Search } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 
+import { ApiError } from '@/core/api/errors'
 import AppShell from '@/core/components/AppShell.vue'
 import Badge from '@/core/components/Badge.vue'
+import Button from '@/core/components/Button.vue'
 import Card from '@/core/components/Card.vue'
 import DataTable from '@/core/components/DataTable.vue'
 import ListState from '@/core/components/ListState.vue'
 import Pagination from '@/core/components/Pagination.vue'
+import { useToast } from '@/core/composables/useToast'
+import { useAgencyOptionsStore } from '@/core/stores/agencyOptions'
+import '@/core/styles/backoffice.css'
 import { formatDate, formatText } from '@/core/utils/format'
 
+import * as ordersApi from '../api/orders.api'
 import { useOrdersTable } from '../composables/useOrdersTable'
 
 /**
  * Órdenes, paginadas **en el servidor** con el sobre estándar (`data` + `meta`).
- *
- * La fila solo trae ids (emisor, receptor y agencias): el nombre de cada uno
- * llega cuando la Fase 3 amplíe el recurso, así que aquí no se inventa nada.
- * Tampoco hay alta todavía: crear una orden pide los ids de cliente y agencia,
- * que es trabajo de esa misma fase.
+ * Atención al cliente entra por el `ticket_code`: la búsqueda lleva directo al
+ * detalle.
  *
  * La lógica vive en `composables/useOrdersTable.ts` y el estado en
  * `stores/useOrdersStore.ts`.
  */
 
-const { PER_PAGE, orders, page, goToPage, meta, rows, canCreate, columns, statusVariant } =
-  useOrdersTable()
+const {
+  PER_PAGE,
+  store,
+  orders,
+  goToPage,
+  meta,
+  rows,
+  canCreate,
+  columns,
+  statusVariant,
+  openOrder,
+} = useOrdersTable()
+
+const router = useRouter()
+const toast = useToast()
+const agencies = useAgencyOptionsStore()
+const ticketCode = ref('')
+
+async function findByTicket(): Promise<void> {
+  const code = ticketCode.value.trim().toUpperCase()
+
+  if (code === '') {
+    return
+  }
+
+  try {
+    openOrder((await ordersApi.getOrderByTicket(code)).id)
+  } catch (caught) {
+    toast.error('Order not found', caught instanceof ApiError ? caught.message : undefined)
+  }
+}
 
 onMounted(() => {
+  agencies.ensureLoaded()
   void orders.load()
 })
 </script>
@@ -39,7 +74,38 @@ onMounted(() => {
           <h1 class="page-title">Orders</h1>
           <p class="page-subtitle">All shipments, newest first</p>
         </div>
+        <Button v-if="canCreate" @click="router.push({ name: 'order-create' })">
+          <template #leading><Plus :size="16" /></template>
+          New order
+        </Button>
       </div>
+
+      <Card>
+        <form class="bo-filters" @submit.prevent="findByTicket">
+          <label class="bo-filter">
+            <span>Ticket code</span>
+            <input v-model="ticketCode" maxlength="8" placeholder="AB12CD34" />
+          </label>
+          <Button type="submit" variant="secondary">
+            <template #leading><Search :size="14" /></template>
+            Find
+          </Button>
+          <label class="bo-filter">
+            <span>Status</span>
+            <select
+              :value="store.status"
+              @change="store.filterByStatus(($event.target as HTMLSelectElement).value)"
+            >
+              <option value="">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in_transit">In transit</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+        </form>
+      </Card>
 
       <Card class="table-card">
         <template #header>
@@ -48,9 +114,6 @@ onMounted(() => {
               Orders
               <span v-if="meta">({{ meta.total }})</span>
             </h2>
-            <span v-if="canCreate" class="table-hint">
-              Creating orders from here arrives with the next phase
-            </span>
           </div>
         </template>
 
@@ -75,17 +138,20 @@ onMounted(() => {
             </template>
             <template #weight_kg="{ row }">{{ formatText(row.weight_kg) }}</template>
             <template #total_amount="{ row }">{{ formatText(row.total_amount) }}</template>
-            <template #sender_id="{ row }">#{{ formatText(row.sender_id) }}</template>
-            <template #receiver_id="{ row }">#{{ formatText(row.receiver_id) }}</template>
-            <template #origin_agency_id="{ row }">#{{ formatText(row.origin_agency_id) }}</template>
+            <template #origin_agency_id="{ row }">{{
+              agencies.label(row.origin_agency_id)
+            }}</template>
             <template #destination_agency_id="{ row }">
-              #{{ formatText(row.destination_agency_id) }}
+              {{ agencies.label(row.destination_agency_id) }}
             </template>
             <template #created_at="{ row }">{{ formatDate(String(row.created_at)) }}</template>
+            <template #actions="{ row }">
+              <button class="bo-link" @click="openOrder(row.id)">View</button>
+            </template>
           </DataTable>
 
           <Pagination
-            :page="page"
+            :page="store.page"
             :last-page="meta?.last_page ?? 1"
             :total="meta?.total ?? rows.length"
             :per-page="meta?.per_page ?? PER_PAGE"

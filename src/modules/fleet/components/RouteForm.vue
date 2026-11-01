@@ -3,6 +3,7 @@ import { computed, reactive, ref } from 'vue'
 import { Plus, Trash2 } from 'lucide-vue-next'
 
 import { ApiError } from '@/core/api/errors'
+import AgencySelect from '@/core/components/AgencySelect.vue'
 import Button from '@/core/components/Button.vue'
 import FormField from '@/core/components/FormField.vue'
 import Input from '@/core/components/Input.vue'
@@ -86,8 +87,8 @@ async function submit(): Promise<void> {
 
 <template>
   <form class="fleet-form" @submit.prevent="submit">
-    <FormField label="Origin agency ID" :error="error?.fieldError('origin_agency_id')">
-      <Input v-model="form.origin" type="number" placeholder="1" />
+    <FormField label="Origin agency" :error="error?.fieldError('origin_agency_id')">
+      <AgencySelect v-model="form.origin" aria-label="Origin agency" />
     </FormField>
 
     <div class="fleet-grid">
@@ -104,13 +105,16 @@ async function submit(): Promise<void> {
       <div class="fleet-grid">
         <FormField
           :label="
-            index === form.stops.length - 1
-              ? 'Destination agency ID'
-              : `Stop ${index + 1} agency ID`
+            index === form.stops.length - 1 ? 'Destination agency' : `Stop ${index + 1} agency`
           "
           :error="error?.fieldError(`segments.${index}.to_agency_id`)"
         >
-          <Input v-model="stop.agency" type="number" placeholder="2" />
+          <AgencySelect
+            v-model="stop.agency"
+            :aria-label="
+              index === form.stops.length - 1 ? 'Destination agency' : `Stop ${index + 1} agency`
+            "
+          />
         </FormField>
 
         <FormField

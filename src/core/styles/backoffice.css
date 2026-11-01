@@ -1,0 +1,172 @@
+/* Estilos compartidos por las pantallas de los módulos de la Fase 7. */
+
+.bo-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.bo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bo-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.bo-subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.bo-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bo-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-secondary);
+}
+
+.bo-filter select,
+.bo-filter input {
+  min-width: 150px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.bo-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.bo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border: none;
+  background: none;
+  color: #6366f1;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.bo-link:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.bo-link.danger {
+  color: var(--danger);
+}
+
+.bo-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.bo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.bo-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+}
+
+.bo-form-error {
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.bo-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bo-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bo-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.bo-details dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bo-details dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+
+.bo-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.bo-tab {
+  padding: 8px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bo-tab.active {
+  border-bottom-color: #6366f1;
+  color: var(--fg);
+}
+
+@media (max-width: 640px) {
+  .bo-grid {
+    grid-template-columns: 1fr;
+  }
+}
