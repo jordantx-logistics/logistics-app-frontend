@@ -265,6 +265,27 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/dashboard/kpis': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Dashboard indicators
+     * @description Only the indicators your permissions allow, limited to your agency scope.
+     *     They may lag up to a minute.
+     */
+    get: operations['dashboardIndicators']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/finance/cash-closures': {
     parameters: {
       query?: never
@@ -1407,6 +1428,170 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/incidents': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List incidents */
+    get: operations['listIncidents']
+    put?: never
+    /**
+     * Open an incident
+     * @description The deadline comes from the incident type.
+     */
+    post: operations['openAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    /** Show an incident */
+    get: operations['showAnIncident']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/assignees': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    /**
+     * List who can attend an incident
+     * @description Users with `incidents.manage` that cover the incident's agencies.
+     */
+    get: operations['listWhoCanAttendAnIncident']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign an incident */
+    post: operations['assignAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Start attending an incident */
+    post: operations['startAttendingAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/resolve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resolve an incident */
+    post: operations['resolveAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/close': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Close an incident */
+    post: operations['closeAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/reopen': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reopen an incident */
+    post: operations['reopenAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/logistics/agency-coverages': {
     parameters: {
       query?: never
@@ -1438,6 +1623,26 @@ export interface paths {
     get?: never
     /** Update Agency Coverage */
     put: operations['updateAgencyCoverage']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations/options': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List location options
+     * @description Active locations with the minimum data for a selector.
+     */
+    get: operations['listLocationOptions']
+    put?: never
     post?: never
     delete?: never
     options?: never
@@ -2087,6 +2292,27 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/organization/agencies/options': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List agency options
+     * @description Active agencies with the minimum data for a selector, without the agency
+     *     scope: an order can travel to an agency outside the user's.
+     */
+    get: operations['listAgencyOptions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/organization/agencies': {
     parameters: {
       query?: never
@@ -2273,6 +2499,111 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/catalog': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List available reports */
+    get: operations['listAvailableReports']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List my exports */
+    get: operations['listMyExports']
+    put?: never
+    /**
+     * Request an export
+     * @description The file is generated in the background: poll the export until it is
+     *     `ready` or `failed`.
+     */
+    post: operations['requestAnExport']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports/{export}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    /** Show an export */
+    get: operations['showAnExport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports/{export}/download': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    /** Download an export */
+    get: operations['downloadAnExport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/settings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List business settings
+     * @description Returns the effective value of each editable parameter and the value that
+     *     applies when nothing is stored.
+     */
+    get: operations['listBusinessSettings']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update business settings
+     * @description The batch is atomic and audited: an invalid value leaves every parameter as
+     *     it was.
+     */
+    patch: operations['updateBusinessSettings']
     trace?: never
   }
   '/api/v1/health': {
@@ -2983,6 +3314,35 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  dashboardIndicators: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Indicators */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              label?: string
+              value?: string
+              format?: string
+            }[]
           }
         }
       }
@@ -6798,6 +7158,453 @@ export interface operations {
       }
     }
   }
+  listIncidents: {
+    parameters: {
+      query?: {
+        /** @description `open`, `in_progress`, `resolved` or `closed`. */
+        status?: string
+        /** @description `damage`, `loss`, `delay`, `billing` or `other`. */
+        type?: string
+        /** @description `low`, `normal`, `high` or `urgent`. */
+        priority?: string
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Filter by ticket code. */
+        ticket_code?: string
+        /** @description Filter by responsible user. */
+        assigned_to?: number
+        /** @description Only active incidents past their deadline. */
+        overdue?: boolean
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed'
+          /** @enum {string} */
+          type?: 'damage' | 'loss' | 'delay' | 'billing' | 'other'
+          /** @enum {string} */
+          priority?: 'low' | 'normal' | 'high' | 'urgent'
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be 8 characters. */
+          ticket_code?: string
+          /** @description Must be at least 1. */
+          assigned_to?: number
+          overdue?: boolean
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          order_id: number
+          /** @enum {string} */
+          type: 'damage' | 'loss' | 'delay' | 'billing' | 'other'
+          /** @enum {string} */
+          priority?: 'low' | 'normal' | 'high' | 'urgent'
+          /** @description Must not be greater than 2000 characters. */
+          description: string
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listWhoCanAttendAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Candidates */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              name?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  assignAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Responsible user. */
+          user_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  startAttendingAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  resolveAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description What was done. */
+          note: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  closeAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  reopenAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
   listAgencyCoverages: {
     parameters: {
       query?: {
@@ -6945,6 +7752,46 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  listLocationOptions: {
+    parameters: {
+      query: {
+        /** @description Search by ubigeo, district, province or department. */
+        q: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 2 characters. Must not be greater than 100 characters. */
+          q: string
+        }
+      }
+    }
+    responses: {
+      /** @description Options */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+            }[]
           }
         }
       }
@@ -9511,6 +10358,34 @@ export interface operations {
       }
     }
   }
+  listAgencyOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Options */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
   listAgencies: {
     parameters: {
       query?: never
@@ -10111,6 +10986,327 @@ export interface operations {
             errors?: {
               role_ids?: string[]
             }
+          }
+        }
+      }
+    }
+  }
+  listAvailableReports: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Catalog */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              title?: string
+              columns?: string[]
+              statuses?: string[]
+            }[]
+          }
+        }
+      }
+    }
+  }
+  listMyExports: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Report key from the catalog. Must not be greater than 50 characters. */
+          report: string
+          /**
+           * @description `csv`, `xlsx` or `pdf`.
+           * @enum {string}
+           */
+          format: 'csv' | 'xlsx' | 'pdf'
+          /** @description First day (inclusive). Must be a valid date in the format <code>Y-m-d</code>. */
+          from: string
+          /** @description Last day (inclusive). Must be a valid date in the format <code>Y-m-d</code>. Must be a date after or equal to <code>from</code>. */
+          to: string
+          /** @description One agency; without it, your whole scope. Must be at least 1. */
+          agency_id?: number | null
+          /** @description One of the statuses the report accepts. Must not be greater than 30 characters. */
+          status?: string | null
+        }
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'text/plain': string
+        }
+      }
+      /** @description Not ready */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            error_code?: string
+          }
+        }
+      }
+    }
+  }
+  listBusinessSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Settings */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              group?: string
+              label?: string
+              type?: string
+              options?: string | null
+              min?: number
+              max?: number
+              value?: string
+              default?: string
+              is_overridden?: boolean
+              updated_by?: string | null
+              updated_at?: string | null
+            }[]
+          }
+        }
+      }
+    }
+  }
+  updateBusinessSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Parameters to change. Must have at least 1 items. */
+          settings: {
+            /** @description Setting key. */
+            key: string
+            /** @description New value. */
+            value: string
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Updated */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              group?: string
+              label?: string
+              type?: string
+              options?: string | null
+              min?: number
+              max?: number
+              value?: string
+              default?: string
+              is_overridden?: boolean
+              updated_by?: number
+              updated_at?: string
+            }[]
           }
         }
       }
