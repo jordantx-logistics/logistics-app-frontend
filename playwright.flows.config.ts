@@ -14,7 +14,8 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   fullyParallel: false,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  // `github` deja cada fallo como anotación del job, legible sin abrir los logs.
+  reporter: process.env.CI ? [['list'], ['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:5199',
     trace: 'retain-on-failure',
