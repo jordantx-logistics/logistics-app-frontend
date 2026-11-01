@@ -1234,6 +1234,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/identity/attendance/mine/days': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My Attendance Days
+     * @description El consolidado diario del empleado autenticado, del día más reciente al más antiguo.
+     */
+    get: operations['myAttendanceDays']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/identity/attendance/{attendance_id}/void': {
     parameters: {
       query?: never
@@ -2066,6 +2086,7 @@ export interface paths {
      * @description The authenticated courier's open deliveries, with recipient and address. With
      *     `updated_since` it returns the courier's deliveries changed after that moment,
      *     closed ones included. A delivery reassigned to someone else no longer appears.
+     *     With `closed_today` it also returns the ones closed today, for the courier's history.
      */
     get: operations['myRouteSheet']
     put?: never
@@ -6667,6 +6688,48 @@ export interface operations {
       }
     }
   }
+  myAttendanceDays: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              employee_id?: number
+              work_date?: string
+              first_in_at?: string
+              last_out_at?: string
+              worked_minutes?: number
+              lunch_minutes?: number
+              late_minutes?: number
+              status?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
   voidAttendance: {
     parameters: {
       query?: never
@@ -9541,6 +9604,8 @@ export interface operations {
       query?: {
         /** @description ISO 8601 cursor. */
         updated_since?: string
+        /** @description Include today's closed deliveries. */
+        closed_today?: boolean
       }
       header?: never
       path?: never
@@ -9551,6 +9616,7 @@ export interface operations {
         'application/json': {
           /** @description Must be a valid date. */
           updated_since?: string
+          closed_today?: boolean
         }
       }
     }
@@ -9835,6 +9901,8 @@ export interface operations {
         departed_from?: string
         /** @description date Filter up to this date. */
         departed_to?: string
+        /** @description Part of the vehicle plate or the route reference. */
+        search?: string
         /** @description Rows per page (1..100). */
         per_page?: number
       }
@@ -9853,6 +9921,8 @@ export interface operations {
           departed_from?: string
           /** @description Must be a valid date. Must be a date after or equal to <code>departed_from</code>. */
           departed_to?: string
+          /** @description Must be at least 1 character. Must not be greater than 40 characters. */
+          search?: string
           per_page?: number
         }
       }
@@ -9868,7 +9938,9 @@ export interface operations {
               id?: number
               agency_id?: number
               vehicle_id?: number
+              vehicle_plate?: string | null
               driver_id?: number
+              driver_name?: string | null
               route_ref?: string
               departed_at?: string
               items_count?: number
@@ -9951,7 +10023,9 @@ export interface operations {
               id?: number
               agency_id?: number
               vehicle_id?: number
+              vehicle_plate?: string | null
               driver_id?: number
+              driver_name?: string | null
               route_ref?: string
               departed_at?: string
               items_count?: number
@@ -9993,7 +10067,9 @@ export interface operations {
               id?: number
               agency_id?: number
               vehicle_id?: number
+              vehicle_plate?: string | null
               driver_id?: number
+              driver_name?: string | null
               route_ref?: string
               departed_at?: string
               items_count?: number
@@ -10829,6 +10905,7 @@ export interface operations {
               department?: string | null
               ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }[]
             success?: string
             message?: string
@@ -10864,6 +10941,8 @@ export interface operations {
           /** @description Must be 6 characters. */
           ubigeo?: string | null
           is_active?: boolean
+          /** @description Must be at least 0. Must not be greater than 240. */
+          lunch_minutes?: number
         }
       }
     }
@@ -10885,6 +10964,7 @@ export interface operations {
               department?: string | null
               ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string
@@ -10922,6 +11002,7 @@ export interface operations {
               department?: string | null
               ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string
@@ -10960,6 +11041,8 @@ export interface operations {
           /** @description Must be 6 characters. */
           ubigeo?: string | null
           is_active?: boolean
+          /** @description Must be at least 0. Must not be greater than 240. */
+          lunch_minutes?: number
         }
       }
     }
@@ -10981,6 +11064,7 @@ export interface operations {
               department?: string | null
               ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string

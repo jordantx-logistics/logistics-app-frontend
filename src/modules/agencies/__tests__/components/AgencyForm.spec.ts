@@ -26,6 +26,7 @@ describe('AgencyForm', () => {
       address: '99279 Kenyatta Knoll',
       phone: '870-215-1024',
       district: 'Lefflerhaven',
+      lunch_minutes: 60,
       is_active: true,
     })
   })
