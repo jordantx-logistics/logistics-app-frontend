@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 export interface ToggleProps {
   modelValue?: boolean
   label?: string
@@ -15,11 +13,8 @@ const emit = defineEmits<{
   'update:model-value': [value: boolean]
 }>()
 
-const isOn = ref(props.modelValue)
-
 function toggle() {
-  isOn.value = !isOn.value
-  emit('update:model-value', isOn.value)
+  emit('update:model-value', !props.modelValue)
 }
 </script>
 
@@ -28,7 +23,7 @@ export default { name: 'Toggle' }
 
 <template>
   <label class="toggle">
-    <input type="checkbox" :checked="isOn" @change="toggle" />
+    <input type="checkbox" :checked="props.modelValue" @change="toggle" />
     <span class="toggle-slider" />
     <span v-if="props.label" class="toggle-label">{{ props.label }}</span>
   </label>

@@ -1,28 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 export interface TextareaProps {
   modelValue?: string
   placeholder?: string
   rows?: number
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<TextareaProps>(), {
   placeholder: '',
   rows: 3,
   modelValue: '',
+  disabled: false,
 })
 
 const emit = defineEmits<{
   'update:model-value': [value: string]
 }>()
 
-const internalValue = ref(props.modelValue)
-
 function onChange(e: Event) {
-  const val = (e.target as HTMLTextAreaElement).value
-  internalValue.value = val
-  emit('update:model-value', val)
+  emit('update:model-value', (e.target as HTMLTextAreaElement).value)
 }
 </script>
 
@@ -32,9 +28,10 @@ export default { name: 'Textarea' }
 <template>
   <textarea
     class="form-textarea"
-    :value="internalValue"
+    :value="props.modelValue"
     :placeholder="props.placeholder"
     :rows="props.rows"
+    :disabled="props.disabled"
     @input="onChange"
   />
 </template>

@@ -7,6 +7,11 @@ export interface ButtonProps {
   loading?: boolean
   disabled?: boolean
   block?: boolean
+  /**
+   * `button` por defecto: el del navegador es `submit`, y dentro de un formulario un
+   * botón con `@click` enviaría dos veces y "Cancel" también enviaría.
+   */
+  type?: 'button' | 'submit'
 }
 
 defineProps<ButtonProps>()
@@ -26,6 +31,7 @@ export default { name: 'Button' }
       `btn-${size || 'md'}`,
       { loading: loading, block: block },
     ]"
+    :type="type ?? 'button'"
     :disabled="disabled || loading"
     @click="$emit('click')"
   >

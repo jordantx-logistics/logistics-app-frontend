@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 export interface InputProps {
   modelValue?: string | number
   placeholder?: string
@@ -21,12 +19,8 @@ const emit = defineEmits<{
   'update:model-value': [value: string]
 }>()
 
-const internalValue = ref(props.modelValue)
-
 function onChange(e: Event) {
-  const val = (e.target as HTMLInputElement).value
-  internalValue.value = val
-  emit('update:model-value', val)
+  emit('update:model-value', (e.target as HTMLInputElement).value)
 }
 </script>
 
@@ -38,7 +32,7 @@ export default { name: 'Input' }
     <input
       class="auth-input"
       :type="props.type"
-      :value="internalValue"
+      :value="props.modelValue"
       :placeholder="props.placeholder"
       :disabled="props.disabled"
       @input="onChange"
