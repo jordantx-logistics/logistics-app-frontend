@@ -28,6 +28,16 @@ vi.mock('@/core/composables/useToast', () => ({
   useToast: () => ({ success: vi.fn<() => void>(), error: vi.fn<() => void>() }),
 }))
 
+vi.mock('@/core/api/client', () => ({
+  http: {
+    get: vi.fn<() => Promise<unknown>>().mockResolvedValue({
+      data: {
+        data: [10, 27, 42].map((id) => ({ id, code: `AG${id}`, name: `Agency ${id}` })),
+      },
+    }),
+  },
+}))
+
 beforeEach(() => {
   setActivePinia(createPinia())
   createRoute.mockReset().mockResolvedValue({})
@@ -42,18 +52,21 @@ describe('RouteForm', () => {
       global: { stubs: { Button: { template: '<button><slot /></button>' } } },
     })
 
+    await flushPromises()
+
     await wrapper
       .findAll('button')
       .find((b) => b.text().includes('Add a stop'))
       ?.trigger('click')
 
-    const numbers = wrapper.findAll('input[type="number"]')
+    const agencies = wrapper.findAll('select')
+    const distances = wrapper.findAll('input[type="number"]')
 
-    await numbers[0]?.setValue('10')
-    await numbers[1]?.setValue('27')
-    await numbers[2]?.setValue('320')
-    await numbers[3]?.setValue('42')
-    await numbers[4]?.setValue('410')
+    await agencies[0]?.setValue('10')
+    await agencies[1]?.setValue('27')
+    await distances[0]?.setValue('320')
+    await agencies[2]?.setValue('42')
+    await distances[1]?.setValue('410')
     await wrapper.find('input[type="datetime-local"]').setValue('2026-11-15T18:00')
 
     await wrapper.find('form').trigger('submit')
