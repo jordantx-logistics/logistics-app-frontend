@@ -173,10 +173,67 @@ export interface paths {
     put?: never
     /**
      * Register Corporate Customer
-     * @description Creates a new company record, typically requiring RUC formatting and business names.
+     * @description Creates a new company **and** its customer aggregate (`customers`), so it can be used
+     *     as sender/receiver of an order. The RUC is validated (11 digits and check digit)
+     *     in the use case, which answers with an `error_code`.
      */
     post: operations['registerCorporateCustomer']
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/customers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List Customers
+     * @description Returns customers, newest first, paginated with `page` and `per_page` (max 100).
+     *     `q` searches by display name, document number or email.
+     */
+    get: operations['listCustomers']
+    put?: never
+    /**
+     * Register Customer
+     * @description Creates the customer aggregate and its backing person or company in one transaction.
+     *     The document is unique per type and validated (RUC check digit included).
+     */
+    post: operations['registerCustomer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/customers/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    /** Show Customer */
+    get: operations['showCustomer']
+    /**
+     * Update Customer
+     * @description Updates contact data and the backing person/company. The document cannot be changed.
+     */
+    put: operations['updateCustomer']
+    post?: never
+    /**
+     * Deactivate Customer
+     * @description Soft-style deletion: sets `is_active = false`. Rejected with 409 while the
+     *     customer has pending, confirmed or in-transit orders.
+     */
+    delete: operations['deactivateCustomer']
     options?: never
     head?: never
     patch?: never
@@ -197,9 +254,916 @@ export interface paths {
     put?: never
     /**
      * Register Individual Customer
-     * @description Creates a new person record in the database using their personal document (e.g. DNI).
+     * @description Creates a new person **and** its customer aggregate (`customers`), so the person can
+     *     be used as sender/receiver of an order. Business rules (document format and
+     *     uniqueness) run in the use case and answer with an `error_code`.
      */
     post: operations['registerIndividualCustomer']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/dashboard/kpis': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Dashboard indicators
+     * @description Only the indicators your permissions allow, limited to your agency scope.
+     *     They may lag up to a minute.
+     */
+    get: operations['dashboardIndicators']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List cash closures */
+    get: operations['listCashClosures']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Approve a cash closure */
+    post: operations['approveACashClosure']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reject a cash closure */
+    post: operations['rejectACashClosure']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-closures/{closure}/report': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    /** Download the cash closure report */
+    get: operations['downloadTheCashClosureReport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-movements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Register an expense or withdrawal
+     * @description Income movements are generated only by cash payments.
+     */
+    post: operations['registerAnExpenseOrWithdrawal']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/current': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Current open cash session
+     * @description Returns `cash_session: null` when the authenticated cashier has no open session.
+     */
+    get: operations['currentOpenCashSession']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List cash sessions */
+    get: operations['listCashSessions']
+    put?: never
+    /**
+     * Open a cash session
+     * @description The agency is inferred from the authenticated cashier; it is not accepted from the client.
+     */
+    post: operations['openACashSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/{session}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    /** Show a cash session */
+    get: operations['showACashSession']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/cash-sessions/{session}/close': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Close a cash session
+     * @description A zero difference closes immediately. Any difference (tolerance 0.00) keeps the
+     *     session open and returns a pending closure that a supervisor must approve.
+     */
+    post: operations['closeACashSession']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List credit notes */
+    get: operations['listCreditNotes']
+    put?: never
+    /** Issue a credit note */
+    post: operations['issueACreditNote']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes/{creditNote}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+      }
+      cookie?: never
+    }
+    /** Show a credit note */
+    get: operations['showACreditNote']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/credit-notes/{creditNote}/download/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download a credit note artifact */
+    get: operations['downloadACreditNoteArtifact']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List invoices */
+    get: operations['listInvoices']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    /** Show an invoice */
+    get: operations['showAnInvoice']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}/retry': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Retry SUNAT transmission */
+    post: operations['retrySUNATTransmission']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoices/{invoice}/download/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download an invoice artifact */
+    get: operations['downloadAnInvoiceArtifact']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoice-series': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List invoice series */
+    get: operations['listInvoiceSeries']
+    put?: never
+    /** Create an invoice series */
+    post: operations['createAnInvoiceSeries']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/invoice-series/{series}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice series id. */
+        series: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update an invoice series */
+    put: operations['updateAnInvoiceSeries']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/orders/{order}/payment-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Order id. */
+        order: number
+      }
+      cookie?: never
+    }
+    /** Payment status of an order */
+    get: operations['paymentStatusOfAnOrder']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/payments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List payments */
+    get: operations['listPayments']
+    put?: never
+    /** Register a payment */
+    post: operations['registerAPayment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/payments/{payment}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Payment id. */
+        payment: number
+      }
+      cookie?: never
+    }
+    /** Show a payment */
+    get: operations['showAPayment']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List void requests */
+    get: operations['listVoidRequests']
+    put?: never
+    /** Request a void */
+    post: operations['requestAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    /** Show a void request */
+    get: operations['showAVoidRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Approve a void */
+    post: operations['approveAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/finance/voids/{void}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reject a void */
+    post: operations['rejectAVoid']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/drivers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List drivers */
+    get: operations['listDrivers']
+    put?: never
+    /** Register a driver */
+    post: operations['registerADriver']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/drivers/{driver}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Driver id. */
+        driver: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update a driver */
+    patch: operations['updateADriver']
+    trace?: never
+  }
+  '/api/v1/fleet/expenses': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List expenses */
+    get: operations['listExpenses']
+    put?: never
+    /**
+     * Register an expense
+     * @description Fuel requires the receipt and the liters. A per diem can add its receipt
+     *     later, but cannot be liquidated without it.
+     */
+    post: operations['registerAnExpense']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/expenses/{expense}/receipt': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    /** Download the receipt of an expense */
+    get: operations['downloadTheReceiptOfAnExpense']
+    put?: never
+    /** Attach a receipt to an expense */
+    post: operations['attachAReceiptToAnExpense']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/expenses/liquidate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Liquidate or reject expenses */
+    post: operations['liquidateOrRejectExpenses']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List routes */
+    get: operations['listRoutes']
+    put?: never
+    /** Plan a route */
+    post: operations['planARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    /** Show a route */
+    get: operations['showARoute']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/summary': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    /** Show the cost and consumption of a route */
+    get: operations['showTheCostAndConsumptionOfARoute']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/mileage/{log}/photo': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Mileage log id. */
+        log: number
+      }
+      cookie?: never
+    }
+    /** Download an odometer photo */
+    get: operations['downloadAnOdometerPhoto']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign a driver and a vehicle */
+    post: operations['assignADriverAndAVehicle']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/cancel': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Cancel a route */
+    post: operations['cancelARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/sync': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Sync a batch of fleet events
+     * @description Each event is applied on its own and reported as accepted, duplicated or
+     *     rejected. Events carrying a file use their multipart endpoint, with the
+     *     `event_id` as `idempotency_key`.
+     */
+    post: operations['syncABatchOfFleetEvents']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Start a route
+     * @description Idempotent: starting a route already in progress has no further effects.
+     */
+    post: operations['startARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/segments/{segment}/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Segment id. */
+        segment: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Complete a segment */
+    post: operations['completeASegment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/finish': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Finish a route
+     * @description Idempotent: finishing a route already finished has no further effects.
+     */
+    post: operations['finishARoute']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/routes/{route}/mileage': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Register an odometer reading */
+    post: operations['registerAnOdometerReading']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List vehicles */
+    get: operations['listVehicles']
+    put?: never
+    /** Register a vehicle */
+    post: operations['registerAVehicle']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles/{vehicle}/status': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Change the status of a vehicle */
+    patch: operations['changeTheStatusOfAVehicle']
+    trace?: never
+  }
+  '/api/v1/fleet/vehicles/{vehicle}/odometer-correction': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Correct the odometer of a vehicle
+     * @description Audited correction: the only way for a reading to go backwards.
+     */
+    post: operations['correctTheOdometerOfAVehicle']
     delete?: never
     options?: never
     head?: never
@@ -242,6 +1206,46 @@ export interface paths {
      * @description Consolidado diario por empleado (`attendance_days`), filtrable por empleado y rango de fechas.
      */
     get: operations['attendanceSummary']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/attendance/mine': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My Attendance
+     * @description Las marcaciones del empleado autenticado, de la más reciente a la más antigua.
+     */
+    get: operations['myAttendance']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/identity/attendance/mine/days': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My Attendance Days
+     * @description El consolidado diario del empleado autenticado, del día más reciente al más antiguo.
+     */
+    get: operations['myAttendanceDays']
     put?: never
     post?: never
     delete?: never
@@ -486,6 +1490,269 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/v1/incidents': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List incidents */
+    get: operations['listIncidents']
+    put?: never
+    /**
+     * Open an incident
+     * @description The deadline comes from the incident type.
+     */
+    post: operations['openAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    /** Show an incident */
+    get: operations['showAnIncident']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/assignees': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    /**
+     * List who can attend an incident
+     * @description Users with `incidents.manage` that cover the incident's agencies.
+     */
+    get: operations['listWhoCanAttendAnIncident']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign an incident */
+    post: operations['assignAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Start attending an incident */
+    post: operations['startAttendingAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/resolve': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Resolve an incident */
+    post: operations['resolveAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/close': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Close an incident */
+    post: operations['closeAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/incidents/{incident}/reopen': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Reopen an incident */
+    post: operations['reopenAnIncident']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/agency-coverages': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Agency Coverages */
+    get: operations['listAgencyCoverages']
+    put?: never
+    /** Create Agency Coverage */
+    post: operations['createAgencyCoverage']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/agency-coverages/{coverage_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the coverage. */
+        coverage_id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update Agency Coverage */
+    put: operations['updateAgencyCoverage']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations/options': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List location options
+     * @description Active locations with the minimum data for a selector.
+     */
+    get: operations['listLocationOptions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Locations */
+    get: operations['listLocations']
+    put?: never
+    /** Create Location */
+    post: operations['createLocation']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/locations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the location. */
+        id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Update Location
+     * @description Cambiar `zone_id` es cómo se reagrupa un distrito en otra zona de tarifa.
+     */
+    put: operations['updateLocation']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/v1/logistics/orders': {
     parameters: {
       query?: never
@@ -495,7 +1762,7 @@ export interface paths {
     }
     /**
      * List Logistics Orders
-     * @description Returns the orders visible to the authenticated user, newest first, paginated with `page` and `per_page` (max 100).
+     * @description Returns the orders visible to the authenticated user, newest first, paginated with `page` and `per_page` (max 100). All filters are cumulative and never widen the agency scope.
      */
     get: operations['listLogisticsOrders']
     put?: never
@@ -505,6 +1772,693 @@ export interface paths {
      *     Fires a background event when successful.
      */
     post: operations['createLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/by-ticket/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Show Logistics Order by ticket code */
+    get: operations['showLogisticsOrderByTicketCode']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    /** Show Logistics Order */
+    get: operations['showLogisticsOrder']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update Logistics Order
+     * @description Edits shipping and delivery data while the order is `pending` or `confirmed`. It cannot change sender, receiver, agencies, service or tariff. Weight, volume or delivery changes re-quote the order; identity changes after departure are rejected with `ORDER_NOT_EDITABLE`.
+     */
+    patch: operations['updateLogisticsOrder']
+    trace?: never
+  }
+  '/api/v1/logistics/orders/quote': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Quote Logistics Order
+     * @description Calculates the price without persisting anything, using the same pricing engine and rules as order creation.
+     */
+    post: operations['quoteLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Confirm Logistics Order
+     * @description Confirms a pending order (`pending` -> `confirmed`) and freezes its price. Rejects any other transition with `INVALID_STATUS_TRANSITION`.
+     */
+    post: operations['confirmLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/cancel': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Cancel Logistics Order
+     * @description Cancels a pending or confirmed order. Only `pending` and `confirmed` orders can be cancelled.
+     */
+    post: operations['cancelLogisticsOrder']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/orders/{order}/delivery': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update Logistics Order delivery
+     * @description Defines delivery while the order is still `pending` and re-quotes the price (delivery surcharge). Once confirmed, the price is immutable (`ORDER_ALREADY_CONFIRMED`).
+     */
+    patch: operations['updateLogisticsOrderDelivery']
+    trace?: never
+  }
+  '/api/v1/logistics/tariffs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Tariffs */
+    get: operations['listTariffs']
+    put?: never
+    /**
+     * Create Tariff
+     * @description Rechaza alcances incoherentes (`TARIFF_SCOPE_INVALID`), vigencias
+     *     invertidas (`TARIFF_VALIDITY_INVALID`), tramos solapados
+     *     (`TARIFF_BRACKETS_INVALID`) y tarifarios activos solapados del mismo
+     *     alcance (`TARIFF_OVERLAP`, 409).
+     */
+    post: operations['createTariff']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/tariffs/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    /** Show Tariff */
+    get: operations['showTariff']
+    /**
+     * Update Tariff
+     * @description El payload se funde con el tarifario actual antes de validar, y los
+     *     tramos se reemplazan en bloque (los enviados sustituyen a los anteriores).
+     */
+    put: operations['updateTariff']
+    post?: never
+    /** Deactivate Tariff */
+    delete: operations['deactivateTariff']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/zones': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Zones */
+    get: operations['listZones']
+    put?: never
+    /** Create Zone */
+    post: operations['createZone']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/logistics/zones/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the zone. */
+        id: number
+      }
+      cookie?: never
+    }
+    get?: never
+    /** Update Zone */
+    put: operations['updateZone']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List deliveries */
+    get: operations['listDeliveries']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    /** Show a delivery */
+    get: operations['showADelivery']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/evidence/{type}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+        /** @description `signature` or `photo`. */
+        type: string
+      }
+      cookie?: never
+    }
+    /** Download delivery evidence */
+    get: operations['downloadDeliveryEvidence']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/assign': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Assign shipments for delivery */
+    post: operations['assignShipmentsForDelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/route-sheet': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * My route sheet
+     * @description The authenticated courier's open deliveries, with recipient and address. With
+     *     `updated_since` it returns the courier's deliveries changed after that moment,
+     *     closed ones included. A delivery reassigned to someone else no longer appears.
+     *     With `closed_today` it also returns the ones closed today, for the courier's history.
+     */
+    get: operations['myRouteSheet']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/batch': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Sync a batch of delivery events
+     * @description Each event is applied on its own and reported as accepted, duplicated or
+     *     rejected. Retrying an applied `event_id` never repeats the effect.
+     */
+    post: operations['syncABatchOfDeliveryEvents']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/evidence': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Upload delivery evidence
+     * @description Returns the route to send when completing the delivery. Retrying replaces the
+     *     file, so it never accumulates copies.
+     */
+    post: operations['uploadDeliveryEvidence']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/start': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Start a delivery */
+    post: operations['startADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/complete': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Complete a delivery
+     * @description Evidence is recorded as routes (`deliveries/...`), returned by the evidence upload.
+     */
+    post: operations['completeADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/deliveries/{delivery}/fail': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Fail a delivery */
+    post: operations['failADelivery']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List embarks */
+    get: operations['listEmbarks']
+    put?: never
+    /** Create an embark */
+    post: operations['createAnEmbark']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks/{embark}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    /** Show an embark */
+    get: operations['showAnEmbark']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/embarks/{embark}/disembark': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Disembark an embark */
+    post: operations['disembarkAnEmbark']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List inventory counts */
+    get: operations['listInventoryCounts']
+    put?: never
+    /** Open an inventory count */
+    post: operations['openAnInventoryCount']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts/{count}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    /** Show an inventory count */
+    get: operations['showAnInventoryCount']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/inventory-counts/{count}/finish': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Finish an inventory count */
+    post: operations['finishAnInventoryCount']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/receptions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List receptions */
+    get: operations['listReceptions']
+    put?: never
+    /**
+     * Receive shipments
+     * @description Registers one or more parcels at their origin agency. A shipment already
+     *     received with the same scan is reported as duplicated, not as an error.
+     */
+    post: operations['receiveShipments']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/shipments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List shipments */
+    get: operations['listShipments']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/shipments/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Show a shipment */
+    get: operations['showAShipment']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/agencies/{agency}/inventory': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Agency id. */
+        agency: number
+      }
+      cookie?: never
+    }
+    /**
+     * Agency inventory
+     * @description Shipments physically at the agency and not yet delivered, returned or cancelled.
+     */
+    get: operations['agencyInventory']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/scans/sync': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Synchronize PDA scans
+     * @description Accepts a batch of scans. Each item is processed independently and
+     *     returned as accepted, duplicated or rejected.
+     */
+    post: operations['synchronizePDAScans']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/operations/tracking/{ticketCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    /** Look up a shipment timeline */
+    get: operations['lookUpAShipmentTimeline']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/organization/agencies/options': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List agency options
+     * @description Active agencies with the minimum data for a selector, without the agency
+     *     scope: an order can travel to an agency outside the user's.
+     */
+    get: operations['listAgencyOptions']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -697,6 +2651,111 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/catalog': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List available reports */
+    get: operations['listAvailableReports']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List my exports */
+    get: operations['listMyExports']
+    put?: never
+    /**
+     * Request an export
+     * @description The file is generated in the background: poll the export until it is
+     *     `ready` or `failed`.
+     */
+    post: operations['requestAnExport']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports/{export}': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    /** Show an export */
+    get: operations['showAnExport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/reports/exports/{export}/download': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    /** Download an export */
+    get: operations['downloadAnExport']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/v1/settings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List business settings
+     * @description Returns the effective value of each editable parameter and the value that
+     *     applies when nothing is stored.
+     */
+    get: operations['listBusinessSettings']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /**
+     * Update business settings
+     * @description The batch is atomic and audited: an invalid value leaves every parameter as
+     *     it was.
+     */
+    patch: operations['updateBusinessSettings']
     trace?: never
   }
   '/api/v1/health': {
@@ -1035,6 +3094,302 @@ export interface operations {
       }
     }
   }
+  listCustomers: {
+    parameters: {
+      query?: {
+        /** @description Search term (name, document or email). */
+        q?: string
+        /** @description Filter by type: person|company. */
+        customer_type?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, default 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          customer_type: 'person' | 'company'
+          /** @description Must not be greater than 10 characters. */
+          document_type: string
+          /** @description Must not be greater than 20 characters. */
+          document_number: string
+          /** @description Must not be greater than 200 characters. */
+          display_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 255 characters. */
+          address?: string | null
+          /** @description Must be at least 0. */
+          credit_limit?: number | null
+          /** @description Must not be greater than 100 characters. */
+          first_name?: string
+          /** @description Must not be greater than 100 characters. */
+          last_name?: string
+          /** @description Must not be greater than 200 characters. */
+          business_name: string
+          /** @description Must not be greater than 200 characters. */
+          trade_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          contact_email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          contact_phone?: string | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 200 characters. */
+          display_name?: string
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          phone?: string | null
+          /** @description Must not be greater than 255 characters. */
+          address?: string | null
+          /** @description Must be at least 0. */
+          credit_limit?: number | null
+          /** @description Must not be greater than 100 characters. */
+          first_name?: string
+          /** @description Must not be greater than 100 characters. */
+          last_name?: string
+          /** @description Must not be greater than 200 characters. */
+          business_name?: string
+          /** @description Must not be greater than 200 characters. */
+          trade_name?: string | null
+          /** @description Must be a valid email address. Must not be greater than 255 characters. */
+          contact_email?: string | null
+          /** @description Must not be greater than 20 characters. */
+          contact_phone?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  deactivateCustomer: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the customer. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              customer_type?: string
+              person_id?: number
+              company_id?: string | null
+              display_name?: string
+              document_type?: string
+              document_number?: string
+              email?: string
+              phone?: string
+              address?: string | null
+              is_active?: boolean
+              credit_limit?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
   listIndividualCustomers: {
     parameters: {
       query?: never
@@ -1111,6 +3466,2984 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  dashboardIndicators: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Indicators */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              label?: string
+              value?: string
+              format?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  listCashClosures: {
+    parameters: {
+      query?: {
+        /** @description `pending`, `approved` or `rejected`. */
+        status?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  approveACashClosure: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  rejectACashClosure: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why the closure is rejected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              status?: string
+              expected_amount?: string
+              closing_amount?: string
+              difference?: string
+              requested_by?: number
+              approved_by?: number
+              requested_at?: string
+              approved_at?: string
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              report_url?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadTheCashClosureReport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash closure id. */
+        closure: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  registerAnExpenseOrWithdrawal: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description `expense` or `withdrawal`. */
+          type: string
+          /** @description Movement amount. */
+          amount: number
+          /** @description Reason. */
+          note: string
+          /** @description optional External reference type. */
+          reference_type?: string | null
+          /** @description optional External reference id. */
+          reference_id?: number | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              cash_session_id?: number
+              type?: string
+              amount?: string
+              signed_amount?: string
+              reference_type?: string | null
+              reference_id?: string | null
+              note?: string
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  currentOpenCashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json':
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string | null
+                    difference?: string | null
+                    opened_at?: string
+                    closed_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                }
+              }
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: string | null
+                }
+              }
+        }
+      }
+    }
+  }
+  listCashSessions: {
+    parameters: {
+      query?: {
+        /** @description `open` or `closed`. */
+        status?: string
+        /** @description Filter by cashier. */
+        cashier_id?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        opened_from?: string
+        /** @description date Filter up to this date. */
+        opened_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'open' | 'closed'
+          /** @description Must be at least 1. */
+          cashier_id?: number
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          opened_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>opened_from</code>. */
+          opened_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Opening cash. */
+          opening_amount: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              cashier_id?: number
+              status?: string
+              opening_amount?: string
+              expected_amount?: string
+              closing_amount?: string | null
+              difference?: string | null
+              opened_at?: string
+              closed_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  closeACashSession: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Cash session id. */
+        session: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Counted cash. */
+          closing_amount: number
+          /** @description optional Cash count detail. */
+          count?: {
+            /** @description This field is required when <code>count</code> is present. Must be at least 0. */
+            denomination?: number
+            /** @description This field is required when <code>count</code> is present. Must be at least 0. */
+            quantity?: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json':
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    opened_at?: string
+                    closed_at?: string
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                  closure?: {
+                    id?: number
+                    cash_session_id?: number
+                    status?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    requested_by?: number
+                    approved_by?: string | null
+                    requested_at?: string
+                    approved_at?: string
+                    rejected_at?: string | null
+                    rejection_reason?: string | null
+                    created_at?: string
+                    report_url?: string | null
+                  }
+                  requires_approval?: boolean
+                }
+              }
+            | {
+                success?: boolean
+                message?: string
+                data?: {
+                  cash_session?: {
+                    id?: number
+                    agency_id?: number
+                    cashier_id?: number
+                    status?: string
+                    opening_amount?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    opened_at?: string
+                    closed_at?: string | null
+                    created_at?: string
+                    updated_at?: string
+                    movements?: unknown[]
+                    closures?: unknown[]
+                  }
+                  closure?: {
+                    id?: number
+                    cash_session_id?: number
+                    status?: string
+                    expected_amount?: string
+                    closing_amount?: string
+                    difference?: string
+                    requested_by?: number
+                    approved_by?: string | null
+                    requested_at?: string
+                    approved_at?: string | null
+                    rejected_at?: string | null
+                    rejection_reason?: string | null
+                    created_at?: string
+                    report_url?: string | null
+                  }
+                  requires_approval?: boolean
+                }
+              }
+        }
+      }
+    }
+  }
+  listCreditNotes: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter by payment. */
+        payment_id?: number
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          payment_id?: number
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  issueACreditNote: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Payment to credit. */
+          payment_id: number
+          /** @description Credit amount. */
+          amount: number
+          /** @description SUNAT reason code (`01`, `02`, `03`, `06`, `07`). */
+          reason: string
+          /** @description optional Detail. */
+          note?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  showACreditNote: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              agency_id?: number
+              cash_session_id?: number
+              amount?: string
+              currency?: string
+              reason?: string
+              note?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              created_by?: number
+              issued_at?: string
+              created_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadACreditNoteArtifact: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Credit note id. */
+        creditNote: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listInvoices: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description `boleta` or `factura`. */
+        document_type?: string
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        issued_from?: string
+        /** @description date Filter up to this date. */
+        issued_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must not be greater than 30 characters. */
+          ticket_number?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          issued_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>issued_from</code>. */
+          issued_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAnInvoice: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  retrySUNATTransmission: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              order_id?: number
+              payment_id?: number
+              agency_id?: number
+              invoice_series_id?: number
+              document_type?: string
+              series?: string
+              number?: number
+              customer_document_type?: string
+              customer_document_number?: string
+              customer_name?: string
+              taxable_amount?: string
+              igv?: string
+              total?: string
+              currency?: string
+              status?: string
+              sunat_code?: string
+              sunat_message?: string
+              issued_at?: string
+              accepted_at?: string
+              created_at?: string
+              updated_at?: string
+              downloads?: {
+                xml?: string | null
+                pdf?: string | null
+                cdr?: string | null
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnInvoiceArtifact: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice id. */
+        invoice: number
+        /** @description `xml`, `pdf` or `cdr`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listInvoiceSeries: {
+    parameters: {
+      query?: {
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description `boleta` or `factura`. */
+        document_type?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency_id?: number
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must match the regex /^[A-Z0-9]{4}$/. Must be 4 characters. */
+          series?: string
+          /** @description Must be 11 digits. */
+          issuer_ruc?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_name?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_trade_name?: string | null
+          /** @description Must not be greater than 255 characters. */
+          issuer_address?: string | null
+          /** @description Must be 6 digits. */
+          issuer_ubigeo?: string | null
+          /** @description Must be 4 characters. */
+          establishment_code?: string | null
+          is_active?: boolean
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAnInvoiceSeries: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency that issues. */
+          agency_id: number
+          /** @description `boleta` or `factura`. */
+          document_type: string
+          /** @description Four alphanumeric characters. */
+          series: string
+          /** @description Issuer RUC (11 digits). */
+          issuer_ruc: string
+          /** @description Legal name. */
+          issuer_name: string
+          /** @description optional Trade name. */
+          issuer_trade_name?: string | null
+          /** @description optional Fiscal address. */
+          issuer_address?: string | null
+          /** @description optional Six-digit ubigeo. */
+          issuer_ubigeo?: string | null
+          /** @description optional SUNAT establishment code. */
+          establishment_code?: string | null
+          /** @description optional Defaults to true. */
+          is_active?: boolean
+          /** @description optional Defaults to false. */
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  updateAnInvoiceSeries: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Invoice series id. */
+        series: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency_id?: number
+          /** @enum {string} */
+          document_type?: 'boleta' | 'factura'
+          /** @description Must match the regex /^[A-Z0-9]{4}$/. Must be 4 characters. */
+          series?: string
+          /** @description Must be 11 digits. */
+          issuer_ruc?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_name?: string
+          /** @description Must not be greater than 200 characters. */
+          issuer_trade_name?: string | null
+          /** @description Must not be greater than 255 characters. */
+          issuer_address?: string | null
+          /** @description Must be 6 digits. */
+          issuer_ubigeo?: string | null
+          /** @description Must be 4 characters. */
+          establishment_code?: string | null
+          is_active?: boolean
+          is_default?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              document_type?: string
+              series?: string
+              next_number?: number
+              is_active?: boolean
+              is_default?: boolean
+              issuer_ruc?: string
+              issuer_name?: string
+              issuer_trade_name?: string
+              issuer_address?: string
+              issuer_ubigeo?: string
+              establishment_code?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  paymentStatusOfAnOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Order id. */
+        order: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listPayments: {
+    parameters: {
+      query?: {
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description `cash` or `pos`. */
+        payment_method?: string
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must not be greater than 20 characters. */
+          payment_method?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must not be greater than 30 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Order to charge. */
+          order_id: number
+          /** @description Payment amount (partial payments allowed). */
+          amount: number
+          /** @description optional ISO currency. */
+          currency?: string
+          /** @description `cash` or `pos`. */
+          payment_method: string
+          /** @description optional `boleta` or `factura`. */
+          document_type?: string | null
+          /** @description Client idempotency key. */
+          idempotency_key: string
+          /** @description optional Free-text reference (POS operation, voucher). */
+          reference?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAPayment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Payment id. */
+        payment: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              order_id?: number
+              cash_session_id?: number
+              agency_id?: number
+              amount?: string
+              currency?: string
+              payment_method?: string
+              reference?: string | null
+              document_type?: string
+              status?: string
+              created_by?: number
+              paid_at?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listVoidRequests: {
+    parameters: {
+      query?: {
+        /** @description `requested`, `approved` or `rejected`. */
+        status?: string
+        /** @description Filter by payment. */
+        payment_id?: number
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'requested' | 'approved' | 'rejected'
+          /** @description Must be at least 1. */
+          payment_id?: number
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Payment to void. */
+          payment_id: number
+          /** @description Why the payment is voided. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAVoidRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  approveAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  rejectAVoid: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Void id. */
+        void: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why the void is rejected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              payment_id?: number
+              invoice_id?: number
+              reason?: string
+              status?: string
+              requested_by?: number
+              approved_by?: string | null
+              requested_at?: string
+              approved_at?: string | null
+              rejected_at?: string | null
+              rejection_reason?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listDrivers: {
+    parameters: {
+      query?: {
+        /** @description `active`, `inactive` or `suspended`. */
+        status?: string
+        /** @description Filter by home agency. */
+        agency?: number
+        /** @description Only active drivers with a valid license. */
+        available?: boolean
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'active' | 'inactive' | 'suspended'
+          /** @description Must be at least 1. */
+          agency?: number
+          available?: boolean
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerADriver: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description User account of the driver. */
+          user_id: number
+          /** @description License number. */
+          license_number: string
+          /** @description License category. */
+          license_category: string
+          /** @description Expiration date (`Y-m-d`). */
+          license_expires_at: string
+          /** @description optional Contact phone. */
+          phone?: string | null
+          /** @description Home agency. */
+          home_agency_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  updateADriver: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Driver id. */
+        driver: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description optional License number. */
+          license_number?: string
+          /** @description optional License category. */
+          license_category?: string
+          /** @description optional Expiration date (`Y-m-d`). */
+          license_expires_at?: string
+          /** @description optional Contact phone. */
+          phone?: string | null
+          /** @description optional `active`, `inactive` or `suspended`. */
+          status?: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              user_id?: number
+              license_number?: string
+              license_category?: string
+              license_expires_at?: string
+              phone?: string
+              status?: string
+              home_agency_id?: number
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listExpenses: {
+    parameters: {
+      query?: {
+        /** @description Filter by route. */
+        route_id?: number
+        /** @description `per_diem` or `fuel`. */
+        type?: string
+        /** @description `registered`, `liquidated` or `rejected`. */
+        status?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          route_id?: number
+          /** @enum {string} */
+          type?: 'per_diem' | 'fuel'
+          /** @enum {string} */
+          status?: 'registered' | 'liquidated' | 'rejected'
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description Route. */
+          route_id: number
+          /** @description `per_diem` or `fuel`. */
+          type: string
+          /** @description Amount in PEN. */
+          amount: number
+          /** @description optional Liters (fuel). */
+          liters?: number | null
+          /** @description optional Odometer reading. */
+          odometer_km?: number | null
+          /** @description optional Tolerates offline retries. */
+          idempotency_key?: string | null
+          /**
+           * Format: binary
+           * @description optional Receipt (jpg, png or pdf, up to 5 MB).
+           */
+          receipt?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadTheReceiptOfAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  attachAReceiptToAnExpense: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Expense id. */
+        expense: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * Format: binary
+           * @description Receipt (jpg, png or pdf, up to 5 MB).
+           */
+          receipt: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  liquidateOrRejectExpenses: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Expenses of closed routes. */
+          expense_ids: number[]
+          /** @description `liquidated` or `rejected`. */
+          decision: string
+          /** @description optional Required to reject. */
+          reason?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              route_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              type?: string
+              amount?: string
+              currency?: string
+              liters?: string
+              odometer_km?: string
+              has_receipt?: boolean
+              status?: string
+              rejection_reason?: string | null
+              registered_by?: number
+              registered_at?: string
+              reviewed_by?: string | null
+              reviewed_at?: string | null
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listRoutes: {
+    parameters: {
+      query?: {
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Origin or destination agency. */
+        agency?: number
+        /** @description Filter by driver. */
+        driver_id?: number
+        /** @description Filter by vehicle. */
+        vehicle_id?: number
+        /** @description Exact route number. */
+        ticket_number?: string
+        /** @description Planned departure from. */
+        departure_from?: string
+        /** @description Planned departure to. */
+        departure_to?: string
+        /** @description Only routes changed after this moment. */
+        updated_since?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 100 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. */
+          driver_id?: number
+          /** @description Must be at least 1. */
+          vehicle_id?: number
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          departure_from?: string
+          /** @description Must be a valid date. */
+          departure_to?: string
+          /** @description Must be a valid date. */
+          updated_since?: string
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string
+              planned_departure_at?: string
+              planned_arrival_at?: string
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  planARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Origin agency. */
+          origin_agency_id: number
+          /** @description Destination agency. */
+          destination_agency_id: number
+          /** @description Planned departure. */
+          planned_departure_at: string
+          /** @description optional Planned arrival. */
+          planned_arrival_at?: string | null
+          /** @description Segments chaining origin to destination. */
+          segments: {
+            /** @description Segment start. */
+            from_agency_id: number
+            /** @description Segment end. */
+            to_agency_id: number
+            /** @description Distance in km. */
+            distance_km: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  showARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  showTheCostAndConsumptionOfARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              route_id?: number
+              km?: string
+              liters?: string
+              fuel_cost?: string
+              per_diem_cost?: string
+              total_cost?: string
+              km_per_liter?: number
+              cost_per_km?: number
+              is_anomalous?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnOdometerPhoto: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Mileage log id. */
+        log: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              error_code?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  assignADriverAndAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Driver. */
+          driver_id: number
+          /** @description Vehicle. */
+          vehicle_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  cancelARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Why it is cancelled. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  syncABatchOfFleetEvents: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Up to 25 events. */
+          items: {
+            /** @description Client-generated UUID. */
+            event_id: string
+            /** @description `route.start`, `route.finish`, `segment.complete`, `mileage` or `expense`. */
+            type: string
+            /** @description Route id. */
+            route_id: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                event_id?: string
+                status?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  startARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Initial reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  completeASegment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+        /** @description Segment id. */
+        segment: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              route_id?: number
+              sequence?: number
+              from_agency_id?: number
+              to_agency_id?: number
+              distance_km?: string
+              status?: string
+              completed_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  finishARoute: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Final reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: string | null
+              ticket_number?: string | null
+              ticket_code?: string | null
+              origin_agency_id?: string | null
+              destination_agency_id?: string | null
+              driver_id?: string | null
+              vehicle_id?: string | null
+              status?: string | null
+              planned_departure_at?: string | null
+              planned_arrival_at?: string | null
+              started_at?: string | null
+              finished_at?: string | null
+              computed_km?: string | null
+              cancel_reason?: string | null
+              created_at?: string | null
+            }
+          }
+        }
+      }
+    }
+  }
+  registerAnOdometerReading: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Route id. */
+        route: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** @description Reading. */
+          odometer_km: number
+          /** @description optional When it was read. */
+          recorded_at?: string | null
+          /** @description optional Tolerates offline retries. */
+          idempotency_key?: string | null
+          /**
+           * Format: binary
+           * @description optional Odometer photo (jpg, png or pdf, up to 5 MB).
+           */
+          photo?: string | null
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              route_id?: number
+              vehicle_id?: number
+              odometer_km?: string
+              recorded_at?: string
+              recorded_by?: number
+              has_photo?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  listVehicles: {
+    parameters: {
+      query?: {
+        /** @description `available`, `on_route`, `maintenance` or `inactive`. */
+        status?: string
+        /** @description Filter by owner agency. */
+        agency?: number
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'available' | 'on_route' | 'maintenance' | 'inactive'
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  registerAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Plate. */
+          plate: string
+          /** @description `truck`, `van` or `trailer`. */
+          type: string
+          /** @description Load capacity in kg. */
+          capacity_kg: number
+          /** @description Load capacity in m3. */
+          capacity_m3: number
+          /** @description Owner agency. */
+          owner_agency_id: number
+          /** @description optional Current odometer reading. */
+          odometer_km?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  changeTheStatusOfAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description `available`, `maintenance` or `inactive`. */
+          status: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  correctTheOdometerOfAVehicle: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Vehicle id. */
+        vehicle: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Correct reading. */
+          odometer_km: number
+          /** @description Why it is corrected. */
+          reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              plate?: string
+              type?: string
+              capacity_kg?: string
+              capacity_m3?: string
+              owner_agency_id?: number
+              status?: string
+              odometer_km?: string
+              created_at?: string
+              updated_at?: string
+            }
           }
         }
       }
@@ -1279,6 +6612,116 @@ export interface operations {
               first_in_at?: string
               last_out_at?: string
               worked_minutes?: number
+              late_minutes?: number
+              status?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  myAttendance: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              employee_id?: number
+              agency_id?: number
+              type?: string
+              marked_at?: string
+              source?: string
+              device_id?: string | null
+              latitude?: string | null
+              longitude?: string | null
+              ip_address?: string
+              status?: string
+              idempotency_key?: string
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  myAttendanceDays: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              employee_id?: number
+              work_date?: string
+              first_in_at?: string
+              last_out_at?: string
+              worked_minutes?: number
+              lunch_minutes?: number
               late_minutes?: number
               status?: string
             }[]
@@ -2027,12 +7470,463 @@ export interface operations {
       }
     }
   }
-  listLogisticsOrders: {
+  listIncidents: {
     parameters: {
       query?: {
+        /** @description `open`, `in_progress`, `resolved` or `closed`. */
+        status?: string
+        /** @description `damage`, `loss`, `delay`, `billing` or `other`. */
+        type?: string
+        /** @description `low`, `normal`, `high` or `urgent`. */
+        priority?: string
+        /** @description Filter by order. */
+        order_id?: number
+        /** @description Filter by ticket code. */
+        ticket_code?: string
+        /** @description Filter by responsible user. */
+        assigned_to?: number
+        /** @description Only active incidents past their deadline. */
+        overdue?: boolean
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          status?: 'open' | 'in_progress' | 'resolved' | 'closed'
+          /** @enum {string} */
+          type?: 'damage' | 'loss' | 'delay' | 'billing' | 'other'
+          /** @enum {string} */
+          priority?: 'low' | 'normal' | 'high' | 'urgent'
+          /** @description Must be at least 1. */
+          order_id?: number
+          /** @description Must be 8 characters. */
+          ticket_code?: string
+          /** @description Must be at least 1. */
+          assigned_to?: number
+          overdue?: boolean
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          order_id: number
+          /** @enum {string} */
+          type: 'damage' | 'loss' | 'delay' | 'billing' | 'other'
+          /** @enum {string} */
+          priority?: 'low' | 'normal' | 'high' | 'urgent'
+          /** @description Must not be greater than 2000 characters. */
+          description: string
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listWhoCanAttendAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Candidates */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              name?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  assignAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Responsible user. */
+          user_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  startAttendingAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  resolveAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description What was done. */
+          note: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  closeAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  reopenAnIncident: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Incident id. */
+        incident: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              type?: string
+              priority?: string
+              status?: string
+              description?: string
+              assigned_to?: string | null
+              due_at?: string
+              is_overdue?: boolean
+              resolution_note?: string | null
+              resolved_at?: string | null
+              closed_at?: string | null
+              created_by?: number
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listAgencyCoverages: {
+    parameters: {
+      query?: {
+        /** @description Filter by agency. */
+        agency_id?: number
+        /** @description Filter by location. */
+        location_id?: number
         /** @description Page to return. */
         page?: number
-        /** @description Rows per page (1..100, por defecto 15). */
+        /** @description Rows per page (1..100, default 15). */
         per_page?: number
       }
       header?: never
@@ -2049,11 +7943,445 @@ export interface operations {
           'application/json': {
             data?: {
               id?: number
+              agency_id?: number
+              location_id?: number
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAgencyCoverage: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          agency_id: number
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          location_id: number
+          allows_pickup?: boolean
+          allows_delivery?: boolean
+          /** @description Must be at least 0. */
+          delivery_surcharge?: number | null
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              location_id?: number
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateAgencyCoverage: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the coverage. */
+        coverage_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          agency_id: number
+          /** @description The <code>id</code> of an existing record in the locations table. */
+          location_id: number
+          allows_pickup?: boolean
+          allows_delivery?: boolean
+          /** @description Must be at least 0. */
+          delivery_surcharge?: number | null
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              location_id?: number
+              allows_pickup?: boolean
+              allows_delivery?: boolean
+              delivery_surcharge?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listLocationOptions: {
+    parameters: {
+      query: {
+        /** @description Search by ubigeo, district, province or department. */
+        q: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 2 characters. Must not be greater than 100 characters. */
+          q: string
+        }
+      }
+    }
+    responses: {
+      /** @description Options */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  listLocations: {
+    parameters: {
+      query?: {
+        /** @description Search by ubigeo, district, province or department. */
+        q?: string
+        /** @description Filter by zone. */
+        zone_id?: number
+        /** @description Filter by department. */
+        department?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..200, default 50). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
+              is_active?: boolean
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be 6 characters. */
+          ubigeo: string
+          /** @description Must not be greater than 100 characters. */
+          department: string
+          /** @description Must not be greater than 100 characters. */
+          province: string
+          /** @description Must not be greater than 150 characters. */
+          district: string
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          zone_id: number
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLocation: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the location. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must be 6 characters. */
+          ubigeo: string
+          /** @description Must not be greater than 100 characters. */
+          department: string
+          /** @description Must not be greater than 100 characters. */
+          province: string
+          /** @description Must not be greater than 150 characters. */
+          district: string
+          /** @description The <code>id</code> of an existing record in the zones table. */
+          zone_id: number
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ubigeo?: string
+              department?: string
+              province?: string
+              district?: string
+              zone_id?: number
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listLogisticsOrders: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, por defecto 15). */
+        per_page?: number
+        /** @description One status or a comma-separated list (`pending,confirmed`). */
+        status?: string
+        /** @description Filter by origin agency. */
+        origin_agency_id?: number
+        /** @description Filter by destination agency. */
+        destination_agency_id?: number
+        /** @description Filter orders that touch this agency (origin or destination). */
+        agency?: number
+        /** @description date Filter orders created on or after this date (ISO 8601). */
+        created_from?: string
+        /** @description date Filter orders created on or before this date (ISO 8601). */
+        created_to?: string
+        /** @description Filter by sender customer id. */
+        sender_id?: number
+        /** @description Filter by receiver customer id. */
+        receiver_id?: number
+        /** @description Filter by sender document number. */
+        sender_document?: string
+        /** @description Sender document type (`DNI`, `RUC`, `CE`, `PASSPORT`). */
+        sender_document_type?: string
+        /** @description Filter by receiver document number. */
+        receiver_document?: string
+        /** @description Receiver document type (`DNI`, `RUC`, `CE`, `PASSPORT`). */
+        receiver_document_type?: string
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Exact or prefix ticket number. */
+        ticket_number?: string
+        /** @description Exact ticket code or ticket number prefix (shortcut). */
+        ticket?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          status?: string
+          /** @description Must be at least 1. */
+          origin_agency_id?: number
+          /** @description Must be at least 1. */
+          destination_agency_id?: number
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          /** @description Must be at least 1. */
+          sender_id?: number
+          /** @description Must be at least 1. */
+          receiver_id?: number
+          /** @description Must not be greater than 20 characters. */
+          sender_document?: string
+          /** @enum {string} */
+          sender_document_type?: 'DNI' | 'RUC' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 20 characters. */
+          receiver_document?: string
+          /** @enum {string} */
+          receiver_document_type?: 'DNI' | 'RUC' | 'CE' | 'PASSPORT'
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
               ticket_number?: string
               ticket_code?: string
               status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
               weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
               total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
               sender_id?: number
               receiver_id?: number
               origin_agency_id?: number
@@ -2111,6 +8439,19 @@ export interface operations {
           volume_m3?: number | null
           /** @description Must be at least 0. */
           declared_value?: number | null
+          /** @description standard,express. */
+          service_type?: string | null
+          /** @description sender,receiver. */
+          payment_responsibility?: string | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string | null
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+          /** @description Delivery address. */
+          recipient_address?: string | null
+          /** @description Delivery window (ISO 8601). */
+          delivery_scheduled_at?: string | null
+          requires_signature?: boolean
         }
       }
     }
@@ -2126,8 +8467,27 @@ export interface operations {
               ticket_number?: string
               ticket_code?: string
               status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
               weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
               total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
               sender_id?: number
               receiver_id?: number
               origin_agency_id?: number
@@ -2136,6 +8496,2384 @@ export interface operations {
             }
             success?: string
             message?: string
+          }
+        }
+      }
+    }
+  }
+  showLogisticsOrderByTicketCode: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Order description. */
+          description?: string | null
+          /** @description Weight in kilograms. */
+          weight_kg?: number
+          /** @description Volume in cubic meters. */
+          volume_m3?: number | null
+          /** @description Declared value. */
+          declared_value?: number | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+          /** @description when delivery_type=home_delivery. */
+          recipient_address: string | null
+          /** @description Delivery date (ISO 8601). */
+          delivery_scheduled_at?: Record<string, never> | null
+          /** @description Whether the delivery requires a signature. */
+          requires_signature?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  quoteLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          origin_agency_id: number
+          destination_agency_id: number
+          weight_kg: number
+          volume_m3?: number | null
+          /** @description standard,express. */
+          service_type?: string | null
+          /** @description agency_pickup,home_delivery. */
+          delivery_type?: string | null
+          /** @description when delivery_type=home_delivery. */
+          delivery_location_id: number | null
+        }
+      }
+    }
+    responses: {
+      /** @description Cotizacion con tarifario */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              engine?: string
+              chargeable_weight_kg?: number
+              base_price?: number
+              weight_amount?: number
+              minimum_adjustment?: number
+              surcharge?: number
+              total_amount?: number
+              tariff_code?: string
+              breakdown?: {
+                engine?: string
+                total_amount?: number
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  confirmLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  cancelLogisticsOrder: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Cancellation reason. */
+          reason?: string | null
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateLogisticsOrderDelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The order. */
+        order: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @enum {string} */
+          delivery_type: 'agency_pickup' | 'home_delivery'
+          /** @description This field is required when <code>delivery_type</code> is <code>home_delivery</code>. */
+          delivery_location_id?: number | null
+          /** @description This field is required when <code>delivery_type</code> is <code>home_delivery</code>. Must not be greater than 255 characters. */
+          recipient_address?: string | null
+          /** @description Must be a valid date. */
+          delivery_scheduled_at?: string | null
+          requires_signature?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              ticket_number?: string
+              ticket_code?: string
+              status?: string
+              version?: number
+              service_type?: string
+              payment_responsibility?: string
+              description?: string
+              weight_kg?: string
+              volume_m3?: string
+              chargeable_weight_kg?: string | null
+              declared_value?: string
+              tariff_id?: string | null
+              pricing_snapshot?: string | null
+              total_amount?: string
+              delivery_type?: string
+              delivery_location_id?: string | null
+              recipient_address?: string | null
+              delivery_scheduled_at?: string | null
+              requires_signature?: boolean
+              delivery_attempts?: number
+              confirmed_at?: string | null
+              cancelled_at?: string | null
+              delivered_at?: string | null
+              cancelled_reason?: string | null
+              sender_id?: number
+              receiver_id?: number
+              origin_agency_id?: number
+              destination_agency_id?: number
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listTariffs: {
+    parameters: {
+      query?: {
+        /** @description Search by code or name. */
+        q?: string
+        /** @description standard|express. */
+        service_type?: string
+        /** @description national|zone_pair|district_pair. */
+        scope_type?: string
+        /** @description Filter by active flag. */
+        is_active?: boolean
+        /** @description Page to return. */
+        page?: number
+        /** @description Rows per page (1..100, default 15). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 30 characters. */
+          code: string
+          /** @description Must not be greater than 150 characters. */
+          name: string
+          /** @enum {string} */
+          service_type: 'standard' | 'express'
+          /** @enum {string} */
+          scope_type: 'national' | 'zone_pair' | 'district_pair'
+          origin_zone_id?: number | null
+          destination_zone_id?: number | null
+          origin_location_id?: number | null
+          destination_location_id?: number | null
+          /** @description Must be at least 0. */
+          base_price: number
+          /** @description Must be at least 0. */
+          price_per_kg: number
+          /** @description Must be at least 0. */
+          price_per_m3?: number | null
+          /** @description Must be at least 0. */
+          min_charge: number
+          max_weight_kg: number
+          /** @description Must be at least 0. */
+          volumetric_factor?: number | null
+          priority?: number | null
+          /** @description Must be a valid date. */
+          valid_from: string
+          /** @description Must be a valid date. */
+          valid_to?: string | null
+          is_active?: boolean
+          brackets?: ({
+            /** @description Must be at least 0. */
+            from_kg: number
+            /** @description Must be at least 0. */
+            to_kg: number
+            /** @description Must be at least 0. */
+            fixed_fee: number
+            /** @description Must be at least 0. */
+            price_per_kg: number
+          } | null)[]
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 30 characters. */
+          code: string
+          /** @description Must not be greater than 150 characters. */
+          name: string
+          /** @enum {string} */
+          service_type: 'standard' | 'express'
+          /** @enum {string} */
+          scope_type: 'national' | 'zone_pair' | 'district_pair'
+          origin_zone_id?: number | null
+          destination_zone_id?: number | null
+          origin_location_id?: number | null
+          destination_location_id?: number | null
+          /** @description Must be at least 0. */
+          base_price: number
+          /** @description Must be at least 0. */
+          price_per_kg: number
+          /** @description Must be at least 0. */
+          price_per_m3?: number | null
+          /** @description Must be at least 0. */
+          min_charge: number
+          max_weight_kg: number
+          /** @description Must be at least 0. */
+          volumetric_factor?: number | null
+          priority?: number | null
+          /** @description Must be a valid date. */
+          valid_from: string
+          /** @description Must be a valid date. */
+          valid_to?: string | null
+          is_active?: boolean
+          brackets?: ({
+            /** @description Must be at least 0. */
+            from_kg: number
+            /** @description Must be at least 0. */
+            to_kg: number
+            /** @description Must be at least 0. */
+            fixed_fee: number
+            /** @description Must be at least 0. */
+            price_per_kg: number
+          } | null)[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  deactivateTariff: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the tariff. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              service_type?: string
+              scope_type?: string
+              origin_zone_id?: string | null
+              destination_zone_id?: string | null
+              origin_location_id?: string | null
+              destination_location_id?: string | null
+              base_price?: string
+              price_per_kg?: string
+              price_per_m3?: string
+              min_charge?: string
+              max_weight_kg?: string
+              volumetric_factor?: number
+              priority?: number
+              valid_from?: string
+              valid_to?: string | null
+              is_active?: boolean
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listZones: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              is_active?: boolean
+            }[]
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createZone: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 20 characters. */
+          code: string
+          /** @description Must not be greater than 100 characters. */
+          name: string
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  updateZone: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The ID of the zone. */
+        id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 20 characters. */
+          code: string
+          /** @description Must not be greater than 100 characters. */
+          name: string
+          is_active?: boolean
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+              is_active?: boolean
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  listDeliveries: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter by courier. */
+        courier_id?: number
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          courier_id?: number
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadDeliveryEvidence: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+        /** @description `signature` or `photo`. */
+        type: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'text/plain': string
+        }
+      }
+    }
+  }
+  assignShipmentsForDelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Delivery agency. */
+          agency_id: number
+          /** @description Courier employee id. */
+          courier_id: number
+          /** @description Shipment ids. */
+          shipment_ids: number[]
+        }
+      }
+    }
+    responses: {
+      /** @description Assigned */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              status?: string
+              attempt?: number
+            }[]
+          }
+        }
+      }
+    }
+  }
+  myRouteSheet: {
+    parameters: {
+      query?: {
+        /** @description ISO 8601 cursor. */
+        updated_since?: string
+        /** @description Include today's closed deliveries. */
+        closed_today?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be a valid date. */
+          updated_since?: string
+          closed_today?: boolean
+        }
+      }
+    }
+    responses: {
+      /** @description Route sheet */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              attempt?: number
+              recipient_name?: string
+              recipient_phone?: string
+              recipient_address?: string
+              requires_signature?: boolean
+              updated_at?: string
+            }[]
+          }
+        }
+      }
+    }
+  }
+  syncABatchOfDeliveryEvents: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Up to 25 events. */
+          items: {
+            /** @description Client-generated UUID. */
+            event_id: string
+            /** @description `start`, `complete` or `fail`. */
+            action: string
+            /** @description Delivery id. */
+            delivery_id: number
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                event_id?: string
+                status?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  uploadDeliveryEvidence: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /**
+           * @description `signature` or `photo`.
+           * @enum {string}
+           */
+          type: 'signature' | 'photo'
+          /**
+           * Format: binary
+           * @description Image (jpg or png, up to 5 MB). Must be a file. Must not be greater than 5120 kilobytes.
+           */
+          file: string
+        }
+      }
+    }
+    responses: {
+      /** @description Stored */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              path?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  startADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  completeADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Recipient name. */
+          recipient_name: string
+          /** @description Recipient document. */
+          recipient_document: string
+          /** @description Signature route. */
+          signature_path: string
+          /** @description Photo route. */
+          photo_path: string
+          /** @description GPS latitude. */
+          latitude: number
+          /** @description GPS longitude. */
+          longitude: number
+          /** @description ISO 8601 capture time. */
+          captured_at: string
+        }
+      }
+    }
+    responses: {
+      /** @description Delivered */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              delivery?: {
+                id?: number
+                status?: string
+              }
+              order_id?: number
+              shipment_id?: number
+              already?: boolean
+            }
+          }
+        }
+      }
+    }
+  }
+  failADelivery: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Delivery id. */
+        delivery: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Reason. */
+          failure_reason: string
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              shipment_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              agency_id?: number
+              courier_id?: number
+              status?: string
+              attempt?: number
+              delivered_at?: string | null
+              failure_reason?: string | null
+              recipient_name?: string | null
+              recipient_document?: string | null
+              evidence?: {
+                signature_path?: string
+                photo_path?: string
+                latitude?: string
+                longitude?: string
+                captured_at?: string
+              }
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  listEmbarks: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by origin agency. */
+        agency?: number
+        /** @description date Only embarks changed after this moment. */
+        updated_since?: string
+        /** @description date Filter from this date. */
+        departed_from?: string
+        /** @description date Filter up to this date. */
+        departed_to?: string
+        /** @description Part of the vehicle plate or the route reference. */
+        search?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          updated_since?: string
+          /** @description Must be a valid date. */
+          departed_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>departed_from</code>. */
+          departed_to?: string
+          /** @description Must be at least 1 character. Must not be greater than 40 characters. */
+          search?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              vehicle_plate?: string | null
+              driver_id?: number
+              driver_name?: string | null
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  createAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Origin agency. */
+          agency_id: number
+          /** @description Vehicle id. */
+          vehicle_id: number
+          /** @description Driver id. */
+          driver_id: number
+          /** @description Optional route reference. */
+          route_ref?: string | null
+          /** @description Optional ISO 8601 departure. */
+          departed_at?: string | null
+          /** @description Shipments in the manifest. */
+          items: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+            /** @description Must be a valid date. */
+            scanned_at?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              vehicle_plate?: string | null
+              driver_id?: number
+              driver_name?: string | null
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+          }
+        }
+      }
+    }
+  }
+  showAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              vehicle_id?: number
+              vehicle_plate?: string | null
+              driver_id?: number
+              driver_name?: string | null
+              route_ref?: string
+              departed_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  disembarkAnEmbark: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Embark id. */
+        embark: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency where the parcels are unloaded. */
+          agency_id: number
+          /** @description Optional ISO 8601 arrival. */
+          arrived_at?: string | null
+          /** @description Optional subset of tickets; omit to disembark the whole manifest. */
+          items?: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              embark_id?: number
+              arrived_at?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+            duplicated?: string
+          }
+        }
+      }
+    }
+  }
+  listInventoryCounts: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description `open` or `finished`. */
+        status?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @enum {string} */
+          status?: 'open' | 'finished'
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  openAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency to count. */
+          agency_id: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  finishAnInventoryCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Inventory count id. */
+        count: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Counted shipments. */
+          items: {
+            /** @description Shipment id. */
+            shipment_id: number
+            /** @description Whether the parcel was found. */
+            found: boolean
+            /** @description Required when the expected and found states differ. */
+            motive?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              status?: string
+              counted_by?: number
+              finished_at?: string | null
+              items_count?: number
+              summary?: {
+                expected?: number
+                found?: number
+                missing?: number
+                unexpected?: number
+                difference?: number
+              }
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                expected?: boolean
+                found?: boolean
+                difference?: number
+                motive?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            expected?: string
+            found?: string
+            missing?: string
+            unexpected?: string
+          }
+        }
+      }
+    }
+  }
+  listReceptions: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description Filter by agency. */
+        agency?: number
+        /** @description date Filter from this date. */
+        received_from?: string
+        /** @description date Filter up to this date. */
+        received_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be a valid date. */
+          received_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>received_from</code>. */
+          received_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              received_by?: number
+              received_at?: string
+              status?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  receiveShipments: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Agency where the parcels are received. */
+          agency_id: number
+          /** @description List of parcels. */
+          items: {
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description Optional PDA scan UUID. */
+            scan_id?: string | null
+            /** @description Optional ISO 8601 timestamp. */
+            scanned_at?: string | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              agency_id?: number
+              received_by?: number
+              received_at?: string
+              status?: string
+              items_count?: number
+              items?: {
+                id?: number
+                shipment_id?: number
+                ticket_code?: string
+                scan_id?: string | null
+              }[]
+              created_at?: string
+            }
+            success?: string
+            message?: string
+            accepted?: string
+            duplicated?: string
+          }
+        }
+      }
+    }
+  }
+  listShipments: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Filter shipments touching this agency. */
+        agency?: number
+        /** @description Filter by origin agency. */
+        origin_agency_id?: number
+        /** @description Filter by destination agency. */
+        destination_agency_id?: number
+        /** @description Exact 8-char ticket code. */
+        ticket_code?: string
+        /** @description Ticket number prefix. */
+        ticket_number?: string
+        /** @description date Filter from this date. */
+        created_from?: string
+        /** @description date Only shipments changed after this moment. */
+        updated_since?: string
+        /** @description date Filter up to this date. */
+        created_to?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must be at least 1. */
+          agency?: number
+          /** @description Must be at least 1. */
+          origin_agency_id?: number
+          /** @description Must be at least 1. */
+          destination_agency_id?: number
+          /** @description Must not be greater than 8 characters. */
+          ticket_code?: string
+          /** @description Must not be greater than 20 characters. */
+          ticket_number?: string
+          /** @description Must be a valid date. */
+          updated_since?: string
+          /** @description Must be a valid date. */
+          created_from?: string
+          /** @description Must be a valid date. Must be a date after or equal to <code>created_from</code>. */
+          created_to?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  showAShipment: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  agencyInventory: {
+    parameters: {
+      query?: {
+        /** @description Page to return. */
+        page?: number
+        /** @description One status or a comma-separated list. */
+        status?: string
+        /** @description Ticket code or number prefix. */
+        search?: string
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path: {
+        /** @description Agency id. */
+        agency: number
+      }
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must not be greater than 120 characters. */
+          status?: string
+          /** @description Must not be greater than 20 characters. */
+          search?: string
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              created_at?: string
+              updated_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  synchronizePDAScans: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Optional device identifier. */
+          device_id?: string | null
+          /** @description Batch of scans. */
+          scans: {
+            /** @description Client-generated UUID (idempotency key). */
+            scan_id: string
+            /** @description 8-char ticket code. */
+            ticket_code: string
+            /** @description One of reception, embark, disembark, inventory, out_for_delivery. `delivery` is reserved for the delivery endpoint. */
+            scan_type: string
+            /** @description ISO 8601 timestamp. */
+            scanned_at: string
+            /** @description Required for embark/disembark scans. */
+            embark_id?: number | null
+            /** @description Optional agency override. */
+            agency_id?: number | null
+            /** @description Optional GPS latitude. */
+            latitude?: number | null
+            /** @description Optional GPS longitude. */
+            longitude?: number | null
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Batch processed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              accepted?: number
+              duplicated?: number
+              rejected?: number
+              items?: {
+                scan_id?: string
+                status?: string
+                shipment_id?: number
+                shipment_status?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  lookUpAShipmentTimeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description 8-char ticket code. */
+        ticketCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Timeline */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              shipment_id?: number
+              order_id?: number
+              ticket_code?: string
+              ticket_number?: string
+              status?: string
+              origin_agency_id?: number
+              destination_agency_id?: number
+              current_location_agency_id?: number
+              delivered_at?: string | null
+              events?: {
+                id?: number
+                event_type?: string
+                status?: string
+                agency_id?: number
+                scan_id?: string | null
+                meta?: Record<string, never>
+                created_at?: string
+              }[]
+            }
+          }
+        }
+      }
+    }
+  }
+  listAgencyOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Options */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              id?: number
+              code?: string
+              name?: string
+            }[]
           }
         }
       }
@@ -2163,7 +10901,11 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }[]
             success?: string
             message?: string
@@ -2192,7 +10934,15 @@ export interface operations {
           phone?: string | null
           /** @description Must not be greater than 100 characters. */
           district?: string | null
+          /** @description Must not be greater than 100 characters. */
+          province?: string | null
+          /** @description Must not be greater than 100 characters. */
+          department?: string | null
+          /** @description Must be 6 characters. */
+          ubigeo?: string | null
           is_active?: boolean
+          /** @description Must be at least 0. Must not be greater than 240. */
+          lunch_minutes?: number
         }
       }
     }
@@ -2210,7 +10960,11 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string
@@ -2244,7 +10998,11 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string
@@ -2276,7 +11034,15 @@ export interface operations {
           phone?: string | null
           /** @description Must not be greater than 100 characters. */
           district?: string | null
+          /** @description Must not be greater than 100 characters. */
+          province?: string | null
+          /** @description Must not be greater than 100 characters. */
+          department?: string | null
+          /** @description Must be 6 characters. */
+          ubigeo?: string | null
           is_active?: boolean
+          /** @description Must be at least 0. Must not be greater than 240. */
+          lunch_minutes?: number
         }
       }
     }
@@ -2294,7 +11060,11 @@ export interface operations {
               address?: string
               phone?: string
               district?: string
+              province?: string | null
+              department?: string | null
+              ubigeo?: string | null
               is_active?: boolean
+              lunch_minutes?: number
             }
             success?: string
             message?: string
@@ -2717,6 +11487,327 @@ export interface operations {
             errors?: {
               role_ids?: string[]
             }
+          }
+        }
+      }
+    }
+  }
+  listAvailableReports: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Catalog */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              title?: string
+              columns?: string[]
+              statuses?: string[]
+            }[]
+          }
+        }
+      }
+    }
+  }
+  listMyExports: {
+    parameters: {
+      query?: {
+        /** @description Rows per page (1..100). */
+        per_page?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: {
+      content: {
+        'application/json': {
+          /** @description Must be at least 1. Must not be greater than 100. */
+          per_page?: number
+        }
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }[]
+            links?: {
+              first?: string
+              last?: string
+              prev?: string | null
+              next?: string | null
+            }
+            meta?: {
+              current_page?: number
+              from?: number
+              last_page?: number
+              links?: {
+                url?: string | null
+                label?: string
+                page?: string | null
+                active?: boolean
+              }[]
+              path?: string
+              per_page?: number
+              to?: number
+              total?: number
+            }
+            success?: string
+            message?: string
+          }
+        }
+      }
+    }
+  }
+  requestAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Report key from the catalog. Must not be greater than 50 characters. */
+          report: string
+          /**
+           * @description `csv`, `xlsx` or `pdf`.
+           * @enum {string}
+           */
+          format: 'csv' | 'xlsx' | 'pdf'
+          /** @description First day (inclusive). Must be a valid date in the format <code>Y-m-d</code>. */
+          from: string
+          /** @description Last day (inclusive). Must be a valid date in the format <code>Y-m-d</code>. Must be a date after or equal to <code>from</code>. */
+          to: string
+          /** @description One agency; without it, your whole scope. Must be at least 1. */
+          agency_id?: number | null
+          /** @description One of the statuses the report accepts. Must not be greater than 30 characters. */
+          status?: string | null
+        }
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  showAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            data?: {
+              id?: number
+              report?: string
+              format?: string
+              filters?: {
+                to?: string
+                from?: string
+                status?: string | null
+                agency_ids?: string | null
+              }
+              status?: string
+              row_count?: string | null
+              error_code?: string | null
+              started_at?: string | null
+              completed_at?: string | null
+              expires_at?: string | null
+              created_at?: string
+            }
+          }
+        }
+      }
+    }
+  }
+  downloadAnExport: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Export id. */
+        export: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description File */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'text/plain': string
+        }
+      }
+      /** @description Not ready */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            error_code?: string
+          }
+        }
+      }
+    }
+  }
+  listBusinessSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Settings */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              group?: string
+              label?: string
+              type?: string
+              options?: string | null
+              min?: number
+              max?: number
+              value?: string
+              default?: string
+              is_overridden?: boolean
+              updated_by?: string | null
+              updated_at?: string | null
+            }[]
+          }
+        }
+      }
+    }
+  }
+  updateBusinessSettings: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description Parameters to change. Must have at least 1 items. */
+          settings: {
+            /** @description Setting key. */
+            key: string
+            /** @description New value. */
+            value: string
+          }[]
+        }
+      }
+    }
+    responses: {
+      /** @description Updated */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': {
+            success?: boolean
+            message?: string
+            data?: {
+              key?: string
+              group?: string
+              label?: string
+              type?: string
+              options?: string | null
+              min?: number
+              max?: number
+              value?: string
+              default?: string
+              is_overridden?: boolean
+              updated_by?: number
+              updated_at?: string
+            }[]
           }
         }
       }
