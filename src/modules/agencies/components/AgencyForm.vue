@@ -33,6 +33,7 @@ const name = ref('')
 const address = ref('')
 const phone = ref('')
 const district = ref('')
+const lunchMinutes = ref(60)
 const isActive = ref(true)
 
 function orNull(value: string): string | null {
@@ -48,6 +49,7 @@ function onSubmit(): void {
     address: orNull(address.value),
     phone: orNull(phone.value),
     district: orNull(district.value),
+    lunch_minutes: Number(lunchMinutes.value),
     is_active: isActive.value,
   })
 }
@@ -74,6 +76,10 @@ function onSubmit(): void {
 
       <FormField label="District" :error="props.error?.fieldError('district')">
         <Input v-model="district" placeholder="Lefflerhaven" />
+      </FormField>
+
+      <FormField label="Lunch (minutes)" :error="props.error?.fieldError('lunch_minutes')">
+        <Input v-model="lunchMinutes" type="number" placeholder="60" />
       </FormField>
 
       <FormField
